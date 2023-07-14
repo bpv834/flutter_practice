@@ -5,11 +5,11 @@ class MyButton extends StatelessWidget {
 
   MyButton({this.text,this.color,this.image,this.onPressed,this.radius});
 
-  final Widget image;
-  final Widget text;
-  final Color color;
-  final double radius;
-  final VoidCallback onPressed;
+  final Widget? image;
+  final Widget? text;
+  final Color? color;
+  final double? radius;
+  final VoidCallback? onPressed;
 
 
   @override
@@ -20,8 +20,8 @@ class MyButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            image,
-            text,
+            image!,
+            text!,
             Opacity(
               opacity: 0.0,
               child: Image.asset('images/glogo.png'),
@@ -33,7 +33,7 @@ class MyButton extends StatelessWidget {
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
-          Radius.circular(radius),
+          Radius.circular(radius!),
         ),
       ),
     );

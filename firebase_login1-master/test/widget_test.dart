@@ -19,7 +19,6 @@ void main(){
 
 void showData() async{
   startTask();
-  String
   String? account = await accessData();
   fetchData(account!);
 }
