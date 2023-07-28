@@ -42,10 +42,9 @@ class _ChatScreenState extends State<ChatScreen> {
             onPressed: () {
               //로그아웃
               _authentication.signOut();
-              Navigator.pop(context);
             },
             icon: Icon(Icons.exit_to_app_sharp),
-            color: Colors.white,
+            color: Colors.blue,
           )
         ],
       ),

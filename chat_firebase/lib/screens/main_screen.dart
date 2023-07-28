@@ -6,6 +6,9 @@ import '../config/palette.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
+//user name같은 extra data는 클라우드에서 관리함
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class LoginSignupScreen extends StatefulWidget {
   const LoginSignupScreen({Key? key}) : super(key: key);
 
@@ -16,8 +19,10 @@ class LoginSignupScreen extends StatefulWidget {
 class _LoginSignupScreenState extends State<LoginSignupScreen> {
   //인스턴스를 사용자 등록과 인증에 사용함
   final _authentication = FirebaseAuth.instance;
+
   //로그인 페이지인지 구분하는 키
   bool isSignupScreen = true;
+
   //로딩중 표시
   bool showSpinner = false;
   final _formkey = GlobalKey<FormState>();
@@ -79,8 +84,9 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                             ),
                             children: [
                               TextSpan(
-                                text:
-                                    isSignupScreen ? ' to Yammy chat!' : ' back',
+                                text: isSignupScreen
+                                    ? ' to Yammy chat!'
+                                    : ' back',
                                 style: TextStyle(
                                   letterSpacing: 1.0,
                                   fontSize: 25,
@@ -478,7 +484,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                     child: GestureDetector(
                       onTap: () async {
                         setState(() {
-                          showSpinner=true;
+                          showSpinner = true;
                         });
                         if (isSignupScreen) {
                           _tryValidation();
@@ -488,8 +494,15 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                               email: userEmail,
                               password: userPassword,
                             );
-                            setState(() {
-                              showSpinner=false;
+
+                            //doc메서드로 사용자가 등록한 data를 전달할 것임
+                           await FirebaseFirestore.instance
+                                .collection('user')//생성할 컬렉션 명''
+                                .doc(newUser.user!.uid)//FirebaseAuth.instance 객체 newUser
+                           //doc.set메서드는 Future타입 반환 따라서 await객체, set으로 db컬렉션,필드 생성 생성,
+                                .set({
+                              'username': userName,
+                              'email': userEmail,
                             });
                             if (newUser.user != null) {
                               Navigator.push(
@@ -501,13 +514,18 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 ),
                               );
                             }
-
+                            setState(() {
+                              showSpinner = false;
+                            });
                           } catch (e) {
                             print('$e에러다');
+                            setState(() {
+                              showSpinner = false;
+                            });
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content:
-                                    Text('Please check your email and password'),
+                                content: Text(
+                                    'Please check your email and password'),
                                 backgroundColor: Colors.blue,
                               ),
                             );
@@ -518,23 +536,23 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                           _tryValidation();
 
                           try {
-                            final newUser =
-                                await _authentication.signInWithEmailAndPassword(
+                            final newUser = await _authentication
+                                .signInWithEmailAndPassword(
                                     email: userEmail, password: userPassword);
                             if (newUser != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return ChatScreen();
-                                  },
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) {
+                              //       return ChatScreen();
+                              //     },
+                              //   ),
+                              // );
                             }
-                            setState(() {
-                              showSpinner=false;
-                            });
                           } catch (e) {
+                            setState(() {
+                              showSpinner = false;
+                            });
                             print("에러=$e");
                           }
                         }
