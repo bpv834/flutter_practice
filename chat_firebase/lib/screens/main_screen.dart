@@ -1,5 +1,6 @@
 import 'dart:html';
 
+import 'package:chat_firebase/add_image/add_image.dart';
 import 'package:chat_firebase/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import '../config/palette.dart';
@@ -37,6 +38,20 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
       //save 호출 시 폼 전체의 state 값읗 저장 후 텍스트폼필드의 onsaved메서드를 작동시킴
       _formkey.currentState!.save();
     }
+  }
+
+  void showAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: Dialog(
+            backgroundColor: Colors.white,
+            child:AddImage(),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -182,19 +197,37 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                               },
                               child: Column(
                                 children: [
-                                  Text(
-                                    'SignUp',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: isSignupScreen
-                                          ? Palette.activeColor
-                                          : Palette.textColor1,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'SignUp',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: isSignupScreen
+                                              ? Palette.activeColor
+                                              : Palette.textColor1,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showAlert(context);
+                                        },
+                                        child: Icon(
+                                          Icons.image,
+                                          color: isSignupScreen
+                                              ? Colors.cyan
+                                              : Colors.grey[300],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   if (isSignupScreen)
                                     Container(
-                                      margin: EdgeInsets.only(top: 3),
+                                      margin: EdgeInsets.fromLTRB(0, 3, 38, 0),
                                       height: 2,
                                       width: 55,
                                       color: Colors.orange,
@@ -496,10 +529,11 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                             );
 
                             //doc메서드로 사용자가 등록한 data를 전달할 것임
-                           await FirebaseFirestore.instance
-                                .collection('user')//생성할 컬렉션 명''
-                                .doc(newUser.user!.uid)//FirebaseAuth.instance 객체 newUser
-                           //doc.set메서드는 Future타입 반환 따라서 await객체, set으로 db컬렉션,필드 생성 생성,
+                            await FirebaseFirestore.instance
+                                .collection('user') //생성할 컬렉션 명''
+                                .doc(newUser.user!
+                                    .uid) //FirebaseAuth.instance 객체 newUser
+                                //doc.set메서드는 Future타입 반환 따라서 await객체, set으로 db컬렉션,필드 생성 생성,
                                 .set({
                               'username': userName,
                               'email': userEmail,
