@@ -214,13 +214,14 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
+                                          if(isSignupScreen)
                                           showAlert(context);
                                         },
                                         child: Icon(
                                           Icons.image,
                                           color: isSignupScreen
                                               ? Colors.cyan
-                                              : Colors.grey[300],
+                                              : Colors.grey[30 ],
                                         ),
                                       ),
                                     ],
