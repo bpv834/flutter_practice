@@ -18,6 +18,8 @@ class _JsonParseState extends State<JsonParse> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    //then 구문은 Future의 결과를 처리하고 연속적인 작업을 정의하는데 사용됩니다.
+    //then 구문은 getInfo()의 결과가 준비되면 실행되며, 비동기 작업의 결과를 value 매개변수로 받아와서 처리합니다.
     Services.getInfo().then((value) {
       setState(() {
         _user = value;

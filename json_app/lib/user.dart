@@ -1,7 +1,9 @@
-import 'dart:convert';
-
+import 'dart:convert'; //JSON 데이터를 처리합니다.
+//List.from 처음부터 끝까지 다 들어감
+// JSON 형식의 문자열을 Dart 객체로 디코딩하는 역할을 합니다 / json Data를 문자열(Dart객체)로 푸는것
 List<User> userFromJson(String str) => List<User>.from(json.decode(str).map((x) => User.fromJson(x)));
-
+// Dart 객체를 JSON 형식의 문자열로 변환하는 역할을 합니다 /문자열(Dart객체)을 json으로 변환하는 것
+//Dart의 객체를 JSON 형식으로 인코딩하여 외부 시스템과 데이터
 String userToJson(List<User> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class User {
