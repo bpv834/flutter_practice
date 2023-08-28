@@ -15,8 +15,9 @@ class MyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ButtonTheme(
+      colorScheme: ColorScheme.dark(),
       height: 50.0,
-      child: RaisedButton(
+      child: ElevatedButton(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
@@ -28,7 +29,6 @@ class MyButton extends StatelessWidget {
             ),
           ],
         ),
-        color: color,
         onPressed: onPressed,
       ),
       shape: RoundedRectangleBorder(

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx1_level2/view/product_tile.dart';
-
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import '../controller/controller.dart';
 
 class MyPage extends StatelessWidget {
   MyPage({super.key});
   final controller = Get.put(Controller());
+  bool showSpinner = true;
 
   @override
   Widget build(BuildContext context) {

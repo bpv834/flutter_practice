@@ -42,7 +42,7 @@ class LogIn extends StatelessWidget {
           ),
           ButtonTheme(
             height: 50.0,
-            child: RaisedButton(
+            child: ElevatedButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
@@ -57,7 +57,6 @@ class LogIn extends StatelessWidget {
                   ),
                 ],
               ),
-              color: Color(0xFF334D92),
               onPressed: () {},
             ),
             shape: RoundedRectangleBorder(
@@ -71,7 +70,7 @@ class LogIn extends StatelessWidget {
           ),
           ButtonTheme(
             height: 50.0,
-            child: RaisedButton(
+            child: ElevatedButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
@@ -92,7 +91,6 @@ class LogIn extends StatelessWidget {
                   ),
                 ],
               ),
-              color: Colors.green,
               onPressed: () {},
             ),
             shape: RoundedRectangleBorder(
