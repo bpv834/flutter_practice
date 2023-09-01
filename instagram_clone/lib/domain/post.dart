@@ -20,7 +20,7 @@ class Post {
       'id' : id,
       'userId':userId,
       'title': title,
-      'imageUrl':userId,
+      'imageUrl':imageUrl,
     };
   }
 }

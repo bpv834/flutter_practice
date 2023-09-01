@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/tab/home/home_model.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final model = HomeModel();
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,12 +41,31 @@ class HomePage extends StatelessWidget {
                       SizedBox(
                         width: 50,
                         height: 50,
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              model.getProfileImageUrl()),
+                        child: GestureDetector(
+                          onTap: () async {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            await model.updateProfileImage();
+                            setState(() {
+                              isLoading = false;
+                            });
+                          },
+                          child: CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(model.getProfileImageUrl()),
+                          ),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      Stack(
+                        children: [
+                          SizedBox(height: 20),
+                          if (isLoading)
+                            Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                        ],
+                      ),
                       Text(
                         model.getEmail(),
                         style: TextStyle(
@@ -49,9 +76,18 @@ class HomePage extends StatelessWidget {
                       SizedBox(height: 20),
                       Row(
                         children: [
-                          Image.network('https://lh5.googleusercontent.com/p/AF1QipPGl6MqUOpA-oR3QcdGBgaWh67smtnDY1s05ps4=w260-h175-n-k-no',width : 125,fit: BoxFit.cover),
-                          Image.network('https://lh5.googleusercontent.com/p/AF1QipPGl6MqUOpA-oR3QcdGBgaWh67smtnDY1s05ps4=w260-h175-n-k-no',width : 125,fit: BoxFit.cover),
-                          Image.network('https://lh5.googleusercontent.com/p/AF1QipPGl6MqUOpA-oR3QcdGBgaWh67smtnDY1s05ps4=w260-h175-n-k-no',width : 125,fit: BoxFit.cover),
+                          Image.network(
+                              'https://lh5.googleusercontent.com/p/AF1QipPGl6MqUOpA-oR3QcdGBgaWh67smtnDY1s05ps4=w260-h175-n-k-no',
+                              width: 125,
+                              fit: BoxFit.cover),
+                          Image.network(
+                              'https://lh5.googleusercontent.com/p/AF1QipPGl6MqUOpA-oR3QcdGBgaWh67smtnDY1s05ps4=w260-h175-n-k-no',
+                              width: 125,
+                              fit: BoxFit.cover),
+                          Image.network(
+                              'https://lh5.googleusercontent.com/p/AF1QipPGl6MqUOpA-oR3QcdGBgaWh67smtnDY1s05ps4=w260-h175-n-k-no',
+                              width: 125,
+                              fit: BoxFit.cover),
                         ],
                       ),
                       SizedBox(height: 20),

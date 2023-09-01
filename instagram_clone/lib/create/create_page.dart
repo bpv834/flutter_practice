@@ -11,7 +11,7 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  final model = CreateMidel();
+  final model = CreateModel();
   ImagePicker? _imagePicker;
   File? _image;
   final _txtcontroller = TextEditingController();

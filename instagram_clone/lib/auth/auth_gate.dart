@@ -13,6 +13,7 @@ class AuthGate extends StatelessWidget {
     final providers = [EmailAuthProvider()];
 
     return StreamBuilder<User?>(
+      //로그인 상태냐 아니냐의 판단객체
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot){
         if(!snapshot.hasData){
