@@ -1,12 +1,17 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
+import 'package:mask_app/repository/store_repository.dart';
+import 'package:mask_app/view_model/store_model.dart';
 import 'model/store.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  //가장 상위 트리에 value
+  runApp(ChangeNotifierProvider.value(
+    //value의 인스턴스를 builder 메서드에서 사용할 수 있다
+    value: StoreModel(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -33,45 +38,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
-    setState(() {
-      isLoading = true;
-    });
     super.initState();
-    fetch();
   }
 
-  bool isLoading = true;
-  final stores = <Store>[];
+  bool isLoading = false;
   int remains = 0;
-
-  fetch() async {
-    setState(() {
-      isLoading = true;
-    });
-    int cnt = 0;
-    var url =
-        'https://gist.githubusercontent.com/junsuk5/bb7485d5f70974deee920b8f0cd1e2f0/'
-        'raw/063f64d9b343120c2cb01a6555cf9b38761b1d94/sample.json';
-    var response = await http.get(Uri.parse(url));
-    // debugPrint(jsonDecode(response.body).toString());
-    final jsonResult = jsonDecode(response.body);
-    final jsonStores = jsonResult['stores'];
-    setState(() {
-      stores.clear();
-      jsonStores.forEach((e) {
-        if(Store.fromJson(e).remainStat =='plenty' || Store.fromJson(e).remainStat =='some' )
-        stores.add(Store.fromJson(e));
-      });
-      isLoading = false;
-    });
-
-    stores.forEach((element) {
-      if (element.remainStat == 'break' && element.remainStat == null) {
-        cnt++;
-      }
-    });
-    remains = stores.length - cnt;
-  }
 
   Widget _buildRemainStatWidget(Store store) {
     var maskcnt = '판매중지';
@@ -111,39 +82,44 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final storeModel = Provider.of<StoreModel>(context);
     return Scaffold(
         appBar: AppBar(
-          title: Text('마스크 재고 있는 곳 : ${remains}곳'),
+          title: Text('마스크 재고 있는 곳 : 곳'),
           actions: [
             ElevatedButton(
                 onPressed: () {
-                  fetch();
+                  storeModel.fetch().then((e) {
+                    //fetch : 값을 새로 받아서 받은 것을 통지함 통지를 하면 값을 새로 받아 다시 화면을 그림
+                    storeModel.fetch();
+                    // isLoading = storeModel.getStart;
+                  });
                 },
                 child: Icon(Icons.refresh))
           ],
         ),
-        body: isLoading == true
-            ? Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                itemCount: stores.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final store = stores[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black87),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
-                      title: Text(
-                        '${store.name}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                      subtitle: Text('${store.addr}'),
-                      trailing: _buildRemainStatWidget(store),
-                    ),
-                  );
-                },
-              ));
+        // body: isLoading == true
+        //     ? Center(child: CircularProgressIndicator())
+        //     :
+        body: ListView.builder(
+          itemCount: storeModel.stores.length,
+          itemBuilder: (BuildContext context, int index) {
+            final store = storeModel.stores[index];
+            return Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black87),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListTile(
+                title: Text(
+                  '${store.name}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                subtitle: Text('${store.addr}'),
+                trailing: _buildRemainStatWidget(store),
+              ),
+            );
+          },
+        ));
   }
 }
