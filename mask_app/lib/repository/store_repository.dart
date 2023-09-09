@@ -12,9 +12,8 @@ class StoreRepository{
     final jsonResult = jsonDecode(response.body);
     final jsonStores = jsonResult['stores'];
       jsonStores.forEach((e) {
-        if(Store.fromJson(e).remainStat =='plenty' || Store.fromJson(e).remainStat =='some' )
           stores.add(Store.fromJson(e));
       });
-    return stores;
+    return stores.where((e) => e.remainStat =='plenty' || e.remainStat =='some' || e.remainStat =='few').toList();
   }
 }

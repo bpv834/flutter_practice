@@ -6,21 +6,21 @@ import '../model/store.dart';
 //with는 mixin 기능을 구현하기 위한 키워드
 class StoreModel with ChangeNotifier {
   final _storeRepository = StoreRepository();
+
   // ignore: prefer_typing_uninitialized_variables
   List<Store> stores = [];
-  var _start = true;
-  var size;
-
-  bool get getStart{
-    return _start;
-  }
-  Future fetch() async{
-    _start =true;
+  bool isLoading=true;
+  Future fetch() async {
+    isLoading=true;
+    //통지를 해야 반영됨
+    notifyListeners();
     stores = await _storeRepository.fetch();
-    _start = false;
+    //통지를 해야 반영됨
+    isLoading=false;
     notifyListeners();
   }
-  storeModel() async{
-     fetch();
+
+  storeModel() {
+    fetch();
   }
 }
