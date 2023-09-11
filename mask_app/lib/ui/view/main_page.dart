@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mask_app/ui/widget/remain_stat_list_tile.dart';
 import 'package:mask_app/view_model/store_model.dart';
 import 'package:provider/provider.dart';
+import 'package:latlong2/latlong.dart';
+
 
 import '../../model/store.dart';
 
@@ -21,6 +23,7 @@ class MainPage extends StatelessWidget {
             ElevatedButton(
                 onPressed: () {
                   storeModel.fetch();
+                  debugPrint('${storeModel.mylat}, ${storeModel.mylng}');
                 },
                 child: Icon(Icons.refresh))
           ],
@@ -36,15 +39,7 @@ class MainPage extends StatelessWidget {
                 border: Border.all(color: Colors.black87),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: ListTile(
-                title: Text(
-                  '${store.name}',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                subtitle: Text('${store.addr}'),
-                trailing: RemainStatListTile(store: store),
-              ),
+              child: RemainStatListTile(store: store)
             );
           },
         ));

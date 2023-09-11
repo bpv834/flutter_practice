@@ -1,15 +1,16 @@
-import 'dart:convert';
+
 
 class Store {
   String? code;
   String? name;
   String? addr;
   String? type;
-  num? lat;
-  num? lng;
+  double? lat;
+  double? lng;
   String? stockAt;
   String? remainStat;
   String? createdAt;
+  double?  dist;
 
   Store({
     required this.code,
