@@ -1,16 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:image_search/data/api.dart';
-
-import '../model/Photo.dart';
+import 'package:image_search/ui/home_view_model.dart';
 
 class PhotoProvider extends InheritedWidget {
-  final PixabayApi api;
-  final _photoScreamController=StreamController<List<Photo>>()..add([]);
-  Stream<List<Photo>> get photoStream =>_photoScreamController.stream;
-
-  PhotoProvider({super.key, required this.api, required super.child});
+  final HomeViewModel viewModel;
+  const PhotoProvider({super.key, required super.child, required this.viewModel});
 
   static PhotoProvider of(BuildContext context) {
     //context에서 PhotoProvider 형식의 위젯을 찾습니다.
@@ -20,15 +13,11 @@ class PhotoProvider extends InheritedWidget {
     assert(result != null, 'No PixabayApi found in context');
     return result!;
   }
-  Future<void>fetch(String query) async{
-    final result = await api.fetch(query);
-    _photoScreamController.add(result);
-  }
 
   @override
   bool updateShouldNotify(PhotoProvider oldWidget) {
     //바뀐것의 기준을 정하는 것
     // TODO: implement updateShouldNotify
-    return oldWidget.api != api;
+    return true;
   }
 }
