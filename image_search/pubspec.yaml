@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   http:
   json_annotation:
+  freezed:
+  freezed_annotation:
 
 
 dev_dependencies:

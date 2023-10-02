@@ -1,25 +1,18 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
 part 'Photo.g.dart';
+part 'Photo.freezed.dart';
 @JsonSerializable()
-class Photo extends Equatable {
-  int id;
-  String tags;
-  @JsonKey(name: 'previewURL') //json key값을 변환 하고자 할때 사용
-  String previewUrl;
+@freezed
+class Photo with _$Photo {
+  const factory Photo({
+    required int id,
+    required String tags,
+    required String previewURL,
+  }) = _Photo;
 
-  @override
-  // TODO: implement props
-  List<Object?> get props => [id];
-
-  Photo({
-    required this.id,
-    required this.tags,
-    required this.previewUrl,
-  });
-
-  factory Photo.fromJson(Map<String, dynamic> json)=> _$PhotoFromJson(json);
-
-  Map<String, dynamic> toJson()=>_$PhotoToJson(this);
+  factory Photo.fromJson(Map<String, Object?> json)
+  => _$PhotoFromJson(json);
 }
