@@ -5,6 +5,7 @@ import 'package:image_search/data/pixabay_api.dart';
 import 'package:image_search/data/photo_provider.dart';
 import 'package:image_search/ui/home_view_model.dart';
 import 'package:image_search/ui/widget/photo_widget.dart';
+import 'package:provider/provider.dart';
 
 import '../model/Photo.dart';
 
@@ -28,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = PhotoProvider.of(context).viewModel;
+    final viewModel = context.watch<HomeViewModel>();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -62,28 +63,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          StreamBuilder<List<Photo>>(
-              stream: viewModel.photoStream,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                }
-                final photos = snapshot.data!;
-                return Expanded(
-                  child: GridView.builder(
-                      padding: EdgeInsets.all(8),
-                      itemCount: photos.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          //열 개수
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16),
-                      itemBuilder: (context, index) {
-                        final photo = photos[index];
-                        return PhotoWidget(photo: photo);
-                      }),
-                );
-              }),
+          Expanded(
+            child: GridView.builder(
+                padding: EdgeInsets.all(8),
+                itemCount: viewModel.photos.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  //열 개수
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16),
+                itemBuilder: (context, index) {
+                  final photo = viewModel.photos[index];
+                  return PhotoWidget(photo: photo);
+                }),
+          )
         ],
       ),
     );

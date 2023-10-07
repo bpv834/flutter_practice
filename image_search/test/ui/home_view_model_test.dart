@@ -12,27 +12,22 @@ import 'package:image_search/ui/home_view_model.dart';
 
 void main() {
   test('stream이 잘 동작해야한다', () async {
-    final viewModel=HomeViewModel(FakePhotoApiRepository());
+    final viewModel = HomeViewModel(FakePhotoApiRepository());
 
-    viewModel.fetch('query');
+    await viewModel.fetch('query');
 
     final List<Photo> result = fakeJson.map((e) => Photo.fromJson(e)).toList();
 
-    expect(viewModel.photoStream,
-    emitsInOrder([
-      equals([]),
-      equals(result),
-    ]));
-
+    expect(viewModel.photos, result);
   });
 }
-class FakePhotoApiRepository extends PhotoApiRepository{
+
+class FakePhotoApiRepository extends PhotoApiRepository {
   @override
-  Future<List<Photo>> fetch(String query) async{
-   Future.delayed(Duration(milliseconds: 500));
+  Future<List<Photo>> fetch(String query) async {
+    Future.delayed(Duration(milliseconds: 500));
     return fakeJson.map((e) => Photo.fromJson(e)).toList();
   }
-
 }
 
 List<Map<String, dynamic>> fakeJson = [
@@ -42,19 +37,19 @@ List<Map<String, dynamic>> fakeJson = [
   {
     "id": 2295434,
     "pageURL":
-    "https://pixabay.com/photos/spring-bird-bird-tit-spring-blue-2295434/",
+        "https://pixabay.com/photos/spring-bird-bird-tit-spring-blue-2295434/",
     "type": "photo",
     "tags": "spring bird, bird, tit",
     "previewURL":
-    "https://cdn.pixabay.com/photo/2017/05/08/13/15/spring-bird-2295434_150.jpg",
+        "https://cdn.pixabay.com/photo/2017/05/08/13/15/spring-bird-2295434_150.jpg",
     "previewWidth": 150,
     "previewHeight": 99,
     "webformatURL":
-    "https://pixabay.com/get/g9d2ce79fc791e52f37cb13e6fae09e0f9fddbd6bb0d0cb02a58f69e0d94ef8bb2f79b779b9ca24141f4b89b1058d9b7d9719775653308df881e49cb605cfd78e_640.jpg",
+        "https://pixabay.com/get/g9d2ce79fc791e52f37cb13e6fae09e0f9fddbd6bb0d0cb02a58f69e0d94ef8bb2f79b779b9ca24141f4b89b1058d9b7d9719775653308df881e49cb605cfd78e_640.jpg",
     "webformatWidth": 640,
     "webformatHeight": 426,
     "largeImageURL":
-    "https://pixabay.com/get/g9a081e678dc7fd85602f255543cef413515a482f44002e62ba822a52324227aa8d682de8cc9be2d7e0d30f67b4ea7bf95b577f8af4fe3c575f5bc7c063935c6c_1280.jpg",
+        "https://pixabay.com/get/g9a081e678dc7fd85602f255543cef413515a482f44002e62ba822a52324227aa8d682de8cc9be2d7e0d30f67b4ea7bf95b577f8af4fe3c575f5bc7c063935c6c_1280.jpg",
     "imageWidth": 5363,
     "imageHeight": 3575,
     "imageSize": 2938651,
@@ -66,24 +61,24 @@ List<Map<String, dynamic>> fakeJson = [
     "user_id": 334088,
     "user": "JillWellington",
     "userImageURL":
-    "https://cdn.pixabay.com/user/2018/06/27/01-23-02-27_250x250.jpg"
+        "https://cdn.pixabay.com/user/2018/06/27/01-23-02-27_250x250.jpg"
   },
   {
     "id": 3063284,
     "pageURL":
-    "https://pixabay.com/photos/rose-flower-petal-floral-noble-3063284/",
+        "https://pixabay.com/photos/rose-flower-petal-floral-noble-3063284/",
     "type": "photo",
     "tags": "rose, flower, petal",
     "previewURL":
-    "https://cdn.pixabay.com/photo/2018/01/05/16/24/rose-3063284_150.jpg",
+        "https://cdn.pixabay.com/photo/2018/01/05/16/24/rose-3063284_150.jpg",
     "previewWidth": 150,
     "previewHeight": 99,
     "webformatURL":
-    "https://pixabay.com/get/g45bb8222bc0fdd07064c3005df58ccc8435c882d35eb4242151571289ec56f3700841a422efdf453194a239f6aa1596411bd3dfa41d7e16ea29499d1effef712_640.jpg",
+        "https://pixabay.com/get/g45bb8222bc0fdd07064c3005df58ccc8435c882d35eb4242151571289ec56f3700841a422efdf453194a239f6aa1596411bd3dfa41d7e16ea29499d1effef712_640.jpg",
     "webformatWidth": 640,
     "webformatHeight": 426,
     "largeImageURL":
-    "https://pixabay.com/get/g19d09d4edceaefacf162f55d076004d92d0a0c7656bab86c3a56d9d7b6e886b1888d14b2e76f3710336bc93122878fc2a953ad0a00f9c5b1d74177428f69c751_1280.jpg",
+        "https://pixabay.com/get/g19d09d4edceaefacf162f55d076004d92d0a0c7656bab86c3a56d9d7b6e886b1888d14b2e76f3710336bc93122878fc2a953ad0a00f9c5b1d74177428f69c751_1280.jpg",
     "imageWidth": 6000,
     "imageHeight": 4000,
     "imageSize": 3574625,
@@ -95,6 +90,6 @@ List<Map<String, dynamic>> fakeJson = [
     "user_id": 1564471,
     "user": "anncapictures",
     "userImageURL":
-    "https://cdn.pixabay.com/user/2015/11/27/06-58-54-609_250x250.jpg"
+        "https://cdn.pixabay.com/user/2015/11/27/06-58-54-609_250x250.jpg"
   },
 ];

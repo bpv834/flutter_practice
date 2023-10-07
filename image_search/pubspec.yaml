@@ -39,6 +39,7 @@ dependencies:
   json_annotation:
   freezed:
   freezed_annotation:
+  provider:
 
 
 dev_dependencies:
