@@ -5,6 +5,8 @@ part of 'Photo.dart';
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
+
+
 Map<String, dynamic> _$PhotoToJson(Photo instance) => <String, dynamic>{
       'id': instance.id,
       'tags': instance.tags,

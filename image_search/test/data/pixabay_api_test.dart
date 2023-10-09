@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_search/data/data_source/pixabay_api.dart';
+import 'package:image_search/data/data_source/result.dart';
 import 'package:image_search/data/repository/photo_api_repository_impl.dart';
+import 'package:image_search/domain/model/Photo.dart';
 import 'package:mockito/annotations.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
@@ -26,8 +28,8 @@ void main() async {
               '?key=39736546-267efd0798a650266d024ff39&q=iphone&image_type=photo')))
           .thenAnswer((_) async => http.Response(fakeJsonBody!, 200));
 
-      final result = await api.fetch('iphone');
-      expect(result.first.id, 2681039);
+      final Result<List<Photo>> result = await api.fetch('iphone');
+      expect((result as Success<List<Photo>>).data.first.id, 2681039);
     },
   );
 

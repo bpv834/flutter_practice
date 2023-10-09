@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,11 +16,30 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _controller = TextEditingController();
+  StreamSubscription? _subscription;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    //바로 수행하면 viewModel을 가져오지 못함, 따라서 Future.microtask()안에서 수행시켜줌 컨텍스트 참조가 바로 안됨
+    Future.microtask(() {
+      final viewModel = context.read<HomeViewModel>();
+      viewModel.eventStream.listen((event) {
+        event.when(showSnackBar: (message) {
+          final snackBar = SnackBar(content: Text(message));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        });
+      });
+    });
+    //initState()에선 context.watch() 불가, 단발성인 read()메서드 사용가능
+  }
 
   @override
   void dispose() {
     // TODO: implement dispose
     _controller.dispose();
+    _subscription?.cancel();
     super.dispose();
   }
 

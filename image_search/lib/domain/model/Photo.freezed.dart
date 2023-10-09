@@ -112,7 +112,7 @@ class __$$_PhotoCopyWithImpl<$Res> extends _$PhotoCopyWithImpl<$Res, _$_Photo>
 
 /// @nodoc
 @JsonSerializable()
-class _$_Photo with DiagnosticableTreeMixin implements _Photo {
+class _$_Photo implements _Photo {
   const _$_Photo(
       {required this.id, required this.tags, required this.previewURL});
 
@@ -127,18 +127,8 @@ class _$_Photo with DiagnosticableTreeMixin implements _Photo {
   final String previewURL;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'Photo(id: $id, tags: $tags, previewURL: $previewURL)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'Photo'))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('tags', tags))
-      ..add(DiagnosticsProperty('previewURL', previewURL));
   }
 
   @override
