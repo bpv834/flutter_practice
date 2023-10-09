@@ -1,13 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:image_search/data/pixabay_api.dart';
-import 'package:image_search/data/photo_provider.dart';
-import 'package:image_search/ui/home_view_model.dart';
-import 'package:image_search/ui/widget/photo_widget.dart';
 import 'package:provider/provider.dart';
 
-import '../model/Photo.dart';
+import 'components/widget/photo_widget.dart';
+import 'home_view_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -68,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.all(8),
                 itemCount: viewModel.photos.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  //열 개수
+                    //열 개수
                     crossAxisCount: 2,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16),

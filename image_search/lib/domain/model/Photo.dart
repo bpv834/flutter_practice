@@ -1,9 +1,8 @@
-import 'package:equatable/equatable.dart';
-import 'package:json_annotation/json_annotation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
-part 'Photo.g.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'Photo.freezed.dart';
+part 'Photo.g.dart';
 @JsonSerializable()
 @freezed
 class Photo with _$Photo {

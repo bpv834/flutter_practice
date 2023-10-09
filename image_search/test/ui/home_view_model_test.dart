@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_search/data/photo_api_repository.dart';
-import 'package:image_search/model/Photo.dart';
-import 'package:image_search/ui/home_view_model.dart';
+import 'package:image_search/domain/model/Photo.dart';
+import 'package:image_search/domain/repository/photo_api_repository.dart';
+import 'package:image_search/presentation/home/home_view_model.dart';
 
 //테스트케이스 순서
 // 1.어떤 테스트를 할 것인지 정하기 (exam: HomeViewModel)

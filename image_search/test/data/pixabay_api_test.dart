@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:image_search/data/pixabay_api.dart';
+import 'package:image_search/data/data_source/pixabay_api.dart';
+import 'package:image_search/data/repository/photo_api_repository_impl.dart';
 import 'package:mockito/annotations.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
@@ -14,8 +15,9 @@ void main() async {
   test(
     'pixbayApi 확인',
     () async {
-      final api = PixabayApi();
       final mockClient = MockClient();
+      final api = PhotoApiRepositoryImpl(PixabayApi(mockClient));
+
       //when : 특정 메소드가 호출될 때 모의 객체의 동작을 지정하기 위해 Dart의 모의 프레임워크(예: Mockito)에서 사용되는 메소드입니다.
       //.thenAnswer((_) async => http.Response(fakeJsonBody!, 200)) 모의 HTTP GET 요청에 대해 지정된 동작입니다
 
@@ -24,7 +26,7 @@ void main() async {
               '?key=39736546-267efd0798a650266d024ff39&q=iphone&image_type=photo')))
           .thenAnswer((_) async => http.Response(fakeJsonBody!, 200));
 
-      final result = await api.fetch('iphone', client: mockClient);
+      final result = await api.fetch('iphone');
       expect(result.first.id, 2681039);
     },
   );
