@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:image_search/data/data_source/result.dart';
 import 'package:image_search/domain/model/Photo.dart';
 import 'package:image_search/domain/repository/photo_api_repository.dart';
+import 'package:image_search/domain/use_case/get_photos_use_case.dart';
 import 'package:image_search/presentation/home/home_view_model.dart';
 
 //테스트케이스 순서
@@ -13,13 +14,13 @@ import 'package:image_search/presentation/home/home_view_model.dart';
 
 void main() {
   test('stream이 잘 동작해야한다', () async {
-    final viewModel = HomeViewModel(FakePhotoApiRepository());
+    final viewModel = HomeViewModel(GetPhotosUseCase(FakePhotoApiRepository()));
 
     await viewModel.fetch('query');
 
     final List<Photo> result = fakeJson.map((e) => Photo.fromJson(e)).toList();
 
-    expect(viewModel.photos, result);
+    expect(viewModel.state.photos, result);
   });
 }
 

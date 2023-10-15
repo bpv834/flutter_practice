@@ -1,35 +1,38 @@
 import 'dart:async';
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
-import 'package:image_search/data/repository/photo_api_repository_impl.dart';
+import 'package:image_search/domain/use_case/get_photos_use_case.dart';
+import 'package:image_search/presentation/home/home_state.dart';
 import 'package:image_search/presentation/home/home_ui_event.dart';
-import 'package:provider/provider.dart';
-
 import '../../data/data_source/result.dart';
 import '../../domain/model/Photo.dart';
 import '../../domain/repository/photo_api_repository.dart';
-
+//Repository를 직접 접근하면 안됨, useCase를 사용해야 함
+//viewModel은 인터페이스 역할만 해줘야 함, 복잡한 로직은 useCase에서 구현
 class HomeViewModel with ChangeNotifier {
-  final PhotoApiRepository repository;
+  final GetPhotosUseCase getPhotosUseCase;
+  HomeViewModel(this.getPhotosUseCase);
 
-  HomeViewModel(this.repository);
+  HomeState _state = HomeState([], false);
+
+  HomeState get state => _state;
+
   final _eventController = StreamController<HomeUiEvent>();
-  Stream<HomeUiEvent> get eventStream => _eventController.stream;
-  List<Photo> _photos = [];
 
-  // List<Photo> get photos => _photos; 를 수정못하도록 unmodifiableListview클래스를 활용 homeScreen에서 .add나 .clear 같은 메서드 실행시 예외처리
-  UnmodifiableListView<Photo> get photos => UnmodifiableListView(_photos);
+  Stream<HomeUiEvent> get eventStream => _eventController.stream;
 
   Future<void> fetch(String query) async {
-    final Result<List<Photo>> result = await repository.fetch(query);
-    result.when(
-        success: (photos) {
-          _photos = photos;
-          notifyListeners();
-        },
-        error: (message) {
-          _eventController.add(HomeUiEvent.showSnackBar(message));
-        });
+    //불변 객체기 때문에 같은 객체에 원하는 값을 변경한 객체를 생성해서 변수에 할당해줌
+    _state =state.copyWith(isLoading: true);
+    notifyListeners();
+    //call메서드를 실행함, call은 생략 가능해서 가독성을 올려줌 getPhotosUseCase.call(query)-> getPhotosUseCase(query);
+    final Result<List<Photo>> result = await getPhotosUseCase(query);
+    result.when(success: (photos)  {
+      _state=state.copyWith(photos: photos);
+      notifyListeners();
+    }, error: (message) {
+      _eventController.add(HomeUiEvent.showSnackBar(message));
+    });
+    _state =state.copyWith(isLoading: false);
+    notifyListeners();
   }
 }
