@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _controller = TextEditingController();
   StreamSubscription? _subscription;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -74,18 +75,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            Expanded(
-              child: GridView.builder(
-                  itemCount: viewModel.photos.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16),
-                  itemBuilder: (context, index) {
-                    final photo = viewModel.photos[index];
-                    return PhotoWidget(photo: photo);
-                  }),
-            )
+            viewModel.state.isLoading
+                ? CircularProgressIndicator()
+                : Expanded(
+                    child: GridView.builder(
+                        itemCount: viewModel.state.photos.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16),
+                        itemBuilder: (context, index) {
+                          final photo = viewModel.state.photos[index];
+                          return PhotoWidget(photo: photo);
+                        }),
+                  )
           ],
         ));
   }

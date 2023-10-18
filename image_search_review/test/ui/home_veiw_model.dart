@@ -1,18 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart';
+import 'package:image_search_review/data/data_source/pixabay_api.dart';
 import 'package:image_search_review/data/data_source/result.dart';
 import 'package:image_search_review/data/repository/photo_api_repository_impl.dart';
 import 'package:image_search_review/domain/model/photo.dart';
 import 'package:image_search_review/domain/repository/photo_api_repository.dart';
+import 'package:image_search_review/domain/use_case/get_photo_use_case.dart';
 import 'package:image_search_review/presentation/home/home_veiw_model.dart';
 
 void main() {
   test('Stream이 잘 동작해야 한다.', () async {
-    final viewModel = HomeViewModel(repository: FakePhotoApiRepository());
+    final viewModel = HomeViewModel(getPhotoUseCase: GetPhotoUseCase(FakePhotoApiRepository()));
 
     final result = fakeJson.map((e) => Photo.fromJson(e)).toList();
     await viewModel.fetch('apple');
     expect(
-        viewModel.photos,result);
+        viewModel.state.photos,result);
   });
 }
 
