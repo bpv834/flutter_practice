@@ -11,7 +11,7 @@ import '../../domain/model/note.dart';
 class AddEditNoteScreen extends StatefulWidget {
   final Note? note;
 
-  //새로 메모를 만들어 안들어올수도 있으니 required X
+  //새로 메모를 만들어 안들어올수도(노트 수정하는 경우) 있으니 required X
   AddEditNoteScreen({super.key, this.note});
 
   @override
@@ -32,18 +32,30 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
 
   @override
   void initState() {
+    if (widget.note != null) {
+      _titleController.text = widget.note!.title;
+      _contentController.text = widget.note!.content;
+    }
     super.initState();
     //init 내에서 view모델을 바로 사용 불가 따라서microtast 사용
     Future.microtask(() {
+      //반드시 context.read로 호출해야 함
       final viewModel = context.read<AddEditNoteViewModel>();
 
       //화면이 사라져도 리슨을 계속 하고있는 상태이기 때문에 subscription으로 관리해야함
       //화면을 닫을때 scription을 cancle해줘야 함
       _streamSubscription = viewModel.eventStream.listen((event) {
-        event.when(saveNote: () {
-          //뒤로가기로 pop이 된건지, 메모를 작성하고 난 후 화면을 리로드한건지 구분 하기 위해 true 넘겨줌
-          Navigator.pop(context, true);
-        });
+        event.when(
+            saveNote: () {
+              //뒤로가기로 pop이 된건지, 메모를 작성하고 난 후 화면을 리로드한건지 구분 하기 위해 true 넘겨줌
+              //true 어디에 넘겨주는것인가?
+              //팝된 화면에 true를 넘겨주는것인가?
+              Navigator.pop(context, true);
+            },
+            showSnackBar: (String message) {
+              final snackBar = SnackBar(content: Text(message));
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            });
       });
     });
   }
@@ -64,16 +76,10 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (_contentController.text.isEmpty ||
-              _titleController.text.isEmpty) {
-            final snackBar = SnackBar(content: Text('내용이 비어 있습니다'));
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          } else {
-            viewModel.onEvent(AddEditNoteEvent.saveNote(
-                widget.note == null ? null : widget.note!.id,
-                _titleController.text,
-                _contentController.text));
-          }
+          viewModel.onEvent(AddEditNoteEvent.saveNote(
+              widget.note == null ? null : widget.note!.id,
+              _titleController.text,
+              _contentController.text));
         },
         child: Icon(Icons.save),
       ),
@@ -84,21 +90,24 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         child: Column(
           children: [
             Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: noteColors
-                    .map(
-                      (color) => InkWell(
-                        //Inkwell == GestureDetector
-                        child: _buildBackgroundColor(
-                            color: color,
-                            selected: viewModel.color == color.value),
-                        onTap: () {
-                          viewModel.onEvent(
-                              AddEditNoteEvent.changeColor(color.value));
-                        },
-                      ),
-                    )
-                    .toList()),
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: noteColors
+                  .map(
+                    (color) => InkWell(
+                      //Inkwell == GestureDetector
+                      //_buildBackgroundColor는 동그란 컨테이너 한개 리턴 색을 map(color)이고, 테두리를 조건부로 만들어줌
+                      child: _buildBackgroundColor(
+                          color: color,
+                          selected: viewModel.color == color.value),
+                      onTap: () {
+                        //InkWell의 onTap
+                        viewModel
+                            .onEvent(AddEditNoteEvent.changeColor(color.value));
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
             TextField(
               controller: _titleController,
               maxLines: 1,

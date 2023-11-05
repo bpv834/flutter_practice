@@ -2,12 +2,12 @@ import 'package:note_app/domain/repository/note_repository.dart';
 
 import '../model/note.dart';
 
-class GetNote {
+class AddNoteUseCase {
   final NoteRepository repository;
 
-  GetNote(this.repository);
+  AddNoteUseCase(this.repository);
 
-  Future<Note?> call(int id) async{
-    return await repository.getNoteById(id);
+  Future<void> call(Note note) async {
+    await repository.insertNote(note);
   }
 }
