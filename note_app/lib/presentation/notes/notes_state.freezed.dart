@@ -17,6 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$NotesState {
   List<Note> get notes => throw _privateConstructorUsedError;
+  NoteOrder get noteOrder => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NotesStateCopyWith<NotesState> get copyWith =>
@@ -29,7 +30,9 @@ abstract class $NotesStateCopyWith<$Res> {
           NotesState value, $Res Function(NotesState) then) =
       _$NotesStateCopyWithImpl<$Res, NotesState>;
   @useResult
-  $Res call({List<Note> notes});
+  $Res call({List<Note> notes, NoteOrder noteOrder});
+
+  $NoteOrderCopyWith<$Res> get noteOrder;
 }
 
 /// @nodoc
@@ -46,13 +49,26 @@ class _$NotesStateCopyWithImpl<$Res, $Val extends NotesState>
   @override
   $Res call({
     Object? notes = null,
+    Object? noteOrder = null,
   }) {
     return _then(_value.copyWith(
       notes: null == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as List<Note>,
+      noteOrder: null == noteOrder
+          ? _value.noteOrder
+          : noteOrder // ignore: cast_nullable_to_non_nullable
+              as NoteOrder,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $NoteOrderCopyWith<$Res> get noteOrder {
+    return $NoteOrderCopyWith<$Res>(_value.noteOrder, (value) {
+      return _then(_value.copyWith(noteOrder: value) as $Val);
+    });
   }
 }
 
@@ -64,7 +80,10 @@ abstract class _$$NotesStateImplCopyWith<$Res>
       __$$NotesStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<Note> notes});
+  $Res call({List<Note> notes, NoteOrder noteOrder});
+
+  @override
+  $NoteOrderCopyWith<$Res> get noteOrder;
 }
 
 /// @nodoc
@@ -79,12 +98,17 @@ class __$$NotesStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? notes = null,
+    Object? noteOrder = null,
   }) {
     return _then(_$NotesStateImpl(
       notes: null == notes
           ? _value._notes
           : notes // ignore: cast_nullable_to_non_nullable
               as List<Note>,
+      noteOrder: null == noteOrder
+          ? _value.noteOrder
+          : noteOrder // ignore: cast_nullable_to_non_nullable
+              as NoteOrder,
     ));
   }
 }
@@ -92,7 +116,9 @@ class __$$NotesStateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$NotesStateImpl with DiagnosticableTreeMixin implements _NotesState {
-  const _$NotesStateImpl({final List<Note> notes = const []}) : _notes = notes;
+  const _$NotesStateImpl(
+      {final List<Note> notes = const [], required this.noteOrder})
+      : _notes = notes;
 
   final List<Note> _notes;
   @override
@@ -104,8 +130,11 @@ class _$NotesStateImpl with DiagnosticableTreeMixin implements _NotesState {
   }
 
   @override
+  final NoteOrder noteOrder;
+
+  @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'NotesState(notes: $notes)';
+    return 'NotesState(notes: $notes, noteOrder: $noteOrder)';
   }
 
   @override
@@ -113,7 +142,8 @@ class _$NotesStateImpl with DiagnosticableTreeMixin implements _NotesState {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'NotesState'))
-      ..add(DiagnosticsProperty('notes', notes));
+      ..add(DiagnosticsProperty('notes', notes))
+      ..add(DiagnosticsProperty('noteOrder', noteOrder));
   }
 
   @override
@@ -121,12 +151,14 @@ class _$NotesStateImpl with DiagnosticableTreeMixin implements _NotesState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$NotesStateImpl &&
-            const DeepCollectionEquality().equals(other._notes, _notes));
+            const DeepCollectionEquality().equals(other._notes, _notes) &&
+            (identical(other.noteOrder, noteOrder) ||
+                other.noteOrder == noteOrder));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_notes));
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_notes), noteOrder);
 
   @JsonKey(ignore: true)
   @override
@@ -136,10 +168,14 @@ class _$NotesStateImpl with DiagnosticableTreeMixin implements _NotesState {
 }
 
 abstract class _NotesState implements NotesState {
-  const factory _NotesState({final List<Note> notes}) = _$NotesStateImpl;
+  const factory _NotesState(
+      {final List<Note> notes,
+      required final NoteOrder noteOrder}) = _$NotesStateImpl;
 
   @override
   List<Note> get notes;
+  @override
+  NoteOrder get noteOrder;
   @override
   @JsonKey(ignore: true)
   _$$NotesStateImplCopyWith<_$NotesStateImpl> get copyWith =>
