@@ -32,6 +32,13 @@ class NotesViewModel with ChangeNotifier {
       loadNotes: _loadNotes,
       deleteNote: _deleteNote,
       restoreNote: _restoreNote,
+      //새로운 노트오더가 들어오면 기존오더를 바꿔주는 기능
+      changeOrder: (NoteOrder newNoteOrder) {
+        _state = state.copyWith(
+          noteOrder: newNoteOrder,
+        );
+        _loadNotes();
+      },
     );
   }
 

@@ -36,6 +36,10 @@ class MyApp extends StatelessWidget {
                 ),
         primaryColor: Colors.white,
         scaffoldBackgroundColor: darkGray,
+        textTheme: Theme.of(context).textTheme.apply(
+          bodyColor: Colors.white,
+        )
+
       ),
       home: NoteScreen(),
     );
