@@ -19,8 +19,11 @@ class OrderSection extends StatelessWidget {
             //Radio는 그룹내에서 하나만 사용할 때
             Radio<NoteOrder>(
               //value는 프로퍼티에 표시할 값 지정, 초기값
+              // value 값이 groupValue로 설정되어 어떤 Radio 버튼이 현재 선택되었는지 판별됩니다.
               value: NoteOrder.title(noteOrder.orderType),
+              // 현재 선택된 Radio 버튼의 값을 저장하는 변수
               groupValue: noteOrder,
+              //이 메서드는 noteScreen에서 받은 메서드
               onChanged: (NoteOrder? value) {
                 onOrderChanged(NoteOrder.title(noteOrder.orderType));
               },
@@ -29,8 +32,11 @@ class OrderSection extends StatelessWidget {
             Text('제목'),
             Radio<NoteOrder>(
               //value는 프로퍼티에 표시할 값 지정, 초기값
+              // value 값이 groupValue로 설정되어 어떤 Radio 버튼이 현재 선택되었는지 판별됩니다.
               value: NoteOrder.date(noteOrder.orderType),
+              //현재 선택된 Radio 버튼의 값을 저장하는 변수
               groupValue: noteOrder,
+              //이 메서드는 noteScreen에서 받은 메서드
               onChanged: (NoteOrder? value) {
                 onOrderChanged(NoteOrder.date(noteOrder.orderType));
               },
@@ -39,8 +45,12 @@ class OrderSection extends StatelessWidget {
             Text('날짜'),
             Radio<NoteOrder>(
               //value는 프로퍼티에 표시할 값 지정, 초기값
+              // value 값이 groupValue로 설정되어 어떤 Radio 버튼이 현재 선택되었는지 판별됩니다.
               value: NoteOrder.color(noteOrder.orderType),
+              //현재 선택된 Radio 버튼의 값을 저장하는 변수
               groupValue: noteOrder,
+
+              //이 메서드는 noteScreen에서 받은 메서드
               onChanged: (NoteOrder? value) {
                 onOrderChanged(NoteOrder.color(noteOrder.orderType));
               },

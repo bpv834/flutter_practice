@@ -26,7 +26,9 @@ class NoteScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              viewModel.onEvent(NotesEvent.toggleOrderSection());
+            },
             icon: Icon(Icons.sort),
           )
         ],
@@ -34,12 +36,16 @@ class NoteScreen extends StatelessWidget {
       body: ListView(
           //ListView는 리스트를 받아야 해서 toList()
           children: [
-            OrderSection(
-              noteOrder: state.noteOrder,
-              onOrderChanged: (NoteOrder noteOrder) {
-                viewModel.onEvent(NotesEvent.changeOrder(noteOrder));
-              },
-            ),
+            state.isOrderSectionVisible
+                ? OrderSection(
+                    //현재 노트오더 상태를 넣어줌
+                    noteOrder: state.noteOrder,
+                    onOrderChanged: (NoteOrder noteOrder) {
+                      //이벤트가 NotesEvent.changeOrder일 경우 매게변수를 이용해 veiwModel.state를 인자값으로 변환해줌
+                      viewModel.onEvent(NotesEvent.changeOrder(noteOrder));
+                    },
+                  )
+                : Container(),
             ...state.notes
                 .map(
                   (note) => GestureDetector(

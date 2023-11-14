@@ -87,7 +87,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         padding: EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 40),
         color: Color(viewModel.color),
         duration: Duration(milliseconds: 500),
-        child: Column(
+        child: ListView(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

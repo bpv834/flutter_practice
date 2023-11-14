@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_app/ui/colors.dart';
 
 import '../../../domain/model/note.dart';
 
@@ -32,7 +33,7 @@ class NoteItem extends StatelessWidget {
                   maxLines: 1,
                   // 넘치는 부분 ,,,표시
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.headlineLarge,
+                  style: Theme.of(context).textTheme.headlineLarge!.apply(color: darkGray),
                 ),
                 SizedBox(height: 8),
                 Text(
@@ -41,7 +42,7 @@ class NoteItem extends StatelessWidget {
                   maxLines: 3,
                   // 넘치는 부분 ,,,표시
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyMedium!.apply(color: darkGray),
                 ),
               ],
             ),

@@ -15,8 +15,9 @@ class NotesViewModel with ChangeNotifier {
 
   //NotesState 클래스에서 Default값으로 [] 을 넣어놨기에 값입력 없이 생성 가능
   //notes의 기본값은 날짜순 내림차
-  NotesState _state = NotesState(
+  NotesState _state = const NotesState(
     noteOrder: NoteOrder.date(OrderType.descending()),
+    isOrderSectionVisible: false,
   );
 
   NotesState get state => _state;
@@ -38,7 +39,12 @@ class NotesViewModel with ChangeNotifier {
           noteOrder: newNoteOrder,
         );
         _loadNotes();
-      },
+      }, toggleOrderSection: () {
+        _state=state.copyWith(
+            isOrderSectionVisible: !_state.isOrderSectionVisible
+        );
+        notifyListeners();
+    },
     );
   }
 
