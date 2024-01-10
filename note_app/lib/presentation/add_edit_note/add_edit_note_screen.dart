@@ -21,6 +21,7 @@ class AddEditNoteScreen extends StatefulWidget {
 class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+  //StreamSubscription은 Dart에서 스트림을 구독하고 해당 스트림에서 발생하는 이벤트를 수신하는 데 사용되는 객체입니다. 스트림은 비동기적으로 데이터를 생성하는데 사용되며, 스트림을 사용하면 데이터가 생성되는 즉시 해당 데이터를 수신하거나 처리할 수 있습니다.
   StreamSubscription? _streamSubscription;
   final List<Color> noteColors = [
     roseBud,

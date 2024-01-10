@@ -1,4 +1,4 @@
-name: note_app
+name: stock_app
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -28,29 +28,23 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-
   flutter:
     sdk: flutter
-  provider:
-  json_annotation:
-  freezed_annotation:
-  sqflite:
-
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  http:
+  freezed_annotation:
+  provider:
+  json_annotation:
+  hive_flutter:
+  hive:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  json_serializable:
-  freezed:
-  build_runner:
-  mockito:
-  sqflite_common_ffi:
-
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -58,6 +52,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  freezed:
+  json_serializable:
+  build_runner:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
