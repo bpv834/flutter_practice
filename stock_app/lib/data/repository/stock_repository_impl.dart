@@ -1,7 +1,9 @@
 import 'package:stock_app/data/csv/company_listings_parser.dart';
+import 'package:stock_app/data/csv/intra_day_info_parser.dart';
 import 'package:stock_app/data/mapper/company_mapper.dart';
 import 'package:stock_app/domain/model/company_info.dart';
 import 'package:stock_app/domain/model/company_listing.dart';
+import 'package:stock_app/domain/model/intra_day_info.dart';
 import 'package:stock_app/domain/repository/stock_repository.dart';
 
 import '../../util/result.dart';
@@ -11,7 +13,8 @@ import '../source/remote/stock_api.dart';
 class StockRepositoryImpl implements StockRepository {
   final StockApi _api;
   final StockDao _dao;
-  final _parser = CompanyListingParser();
+  final _companyListingsParser = CompanyListingParser();
+  final _intraDayInfoParser = IntraDayInfoParser();
 
   StockRepositoryImpl(this._api, this._dao);
 
@@ -34,7 +37,7 @@ class StockRepositoryImpl implements StockRepository {
     try {
       final response = await _api.getListings();
       //csv data는 response.body에 들어있음
-      final remoteListings = await _parser.parse(response.body);
+      final remoteListings = await _companyListingsParser.parse(response.body);
 
       //캐시 비우기
       await _dao.clearCompanyListings();
@@ -50,12 +53,23 @@ class StockRepositoryImpl implements StockRepository {
   }
 
   @override
-  Future<Result<CompanyInfo>> getCompanyInfo(String symbol) async{
+  Future<Result<CompanyInfo>> getCompanyInfo(String symbol) async {
     try {
       final dto = await _api.getCompanyInfo(symbol: symbol);
       return Result.success(dto.toCompanyInfo());
     } catch (e) {
       return Result.error('회사 정보 로드 실패!! :${e.toString()}');
+    }
+  }
+
+  @override
+  Future<Result<List<IntraDayInfo>>> getIntraDayInfo(String symbol) async {
+    try {
+      final response = await _api.getIntraDayInfo(symbol: symbol);
+      final results = await _intraDayInfoParser.parse(response.body);
+      return Result.success(results);
+    } catch (e) {
+      return Result.error('intraDay 정보 로드 실패 : ${e.toString()}');
     }
   }
 }

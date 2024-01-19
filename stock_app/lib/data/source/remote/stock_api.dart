@@ -26,4 +26,11 @@ class StockApi {
     final response=await _client.get(Uri.parse('$baseUrl/query?function=OVERVIEW&symbol=$symbol&apikey=$apiKey'));
     return CompanyInfoDto.fromJson(jsonDecode(response.body));
   }
+  
+  Future<http.Response> getIntraDayInfo({
+    required String symbol,
+    String apikey= apiKey,
+}) async{ 
+    return await _client.get(Uri.parse('$baseUrl/query?function=TIME_SERIES_INTRADAY&symbol=$symbol&interval=60min&apikey=$apiKey&datatype=csv'));
+  }
 }
