@@ -40,6 +40,10 @@ dependencies:
   intl:
   geolocator:
   flutter_naver_map:
+  url_launcher: ^6.1.5
+  image_picker:
+  dio:
+  cached_network_image:
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -75,6 +79,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/kakao.png
+    - images/myLocation.png
+    - images/profileImage.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

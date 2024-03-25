@@ -5,32 +5,58 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/customer_info_view_model.dart';
+import '../../../domain/model/board_info.dart';
 import '../../home_page/home_view_model.dart';
+import '../../nav_page/bottom_bar.dart';
 import '../../nav_page/nav_view_model.dart';
+import '../board_page/components/board_tile.dart';
+import 'my_board_state.dart';
 import 'my_board_view_model.dart';
 
-class MyBoardScreen extends StatelessWidget {
-  MyBoardScreen({super.key});
+class MyBoardScreen extends StatefulWidget {
+  const MyBoardScreen({super.key});
 
-  TextEditingController _controller = TextEditingController();
+  @override
+  State<MyBoardScreen> createState() => _MyBoardScreenState();
+}
+
+class _MyBoardScreenState extends State<MyBoardScreen> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _init(context);
+  }
+
+  _init(BuildContext context) async {
+    final viewModel = context.read<MyBoardViewModel>();
+    final state = viewModel.state;
+    print('state: $state');
+  }
 
   @override
   Widget build(BuildContext context) {
-    final customerInfoViewModel = context.read<CustomerInfoViewModel>();
-    final homeViewModel = context.read<HomeViewModel>();
-    final navViewModel = context.read<NavViewModel>();
-    final myBoardViewModel=context.read<MyBoardViewModel>();
+    final viewModel = context.watch<MyBoardViewModel>();
+    final MyBoardState state = viewModel.state;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-
+        automaticallyImplyLeading: false,
         title: Text(
-          myBoardViewModel.barName,
-          style: TextStyle(
+          state.barName,
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
-
       ),
       body: Column(
         children: [
@@ -44,8 +70,11 @@ class MyBoardScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.0), // 테두리 둥글기 설정
                     ),
                     child: TextField(
+                      onChanged: (query) {
+                        viewModel.searchMyBoardList(query);
+                      },
                       controller: _controller,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: '글 제목, 내용',
                         // 힌트 텍스트
                         contentPadding: EdgeInsets.all(12.0),
@@ -55,120 +84,22 @@ class MyBoardScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                TextButton(onPressed: () {}, child: Text('검색'))
               ],
             ),
           ),
-          Expanded(
-            child: Container(
-              child: ListView(
-                children: [
-                  SingleChildScrollView(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => BoardDetailScreen()),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Colors.black,
-                            )),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: customerInfoViewModel.screenWidth / 2,
-                              // 정사각형의 가로 길이
-                              height: customerInfoViewModel.screenHeight / 6,
-                              // 정사각형의 세로 길이
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey, // 테두리 색상 설정
-                                  width: 1.0, // 테두리 두께 설정
-                                ),
-                                borderRadius: BorderRadius.circular(16.0),
-                                image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: NetworkImage(
-                                        'https://e1.pngegg.com/pngimages/487/453/png-clipart-iu-thumbnail.png')
-                                  // 이미지 파일의 경로
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '게시판 제목',
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      fontSize:
-                                      customerInfoViewModel.screenHeight /
-                                          25,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    '게시판 내용',
-                                    style: TextStyle(
-                                      fontSize:
-                                      customerInfoViewModel.screenHeight /
-                                          35,
-                                    ),
-                                    maxLines: 1,
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
+          state.isLoading != true
+              ? Expanded(
+                  child: ListView.builder(
+                    itemCount: state.boardList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return BoardTile(board: state.boardList[index]);
+                    },
+                  ),
+                )
+              : Container(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.whatshot),
-            label: '홈',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.forum),
-            label: '게시판',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_on),
-            label: '지도',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '나의 정보',
-          ),
-        ],
-        currentIndex: homeViewModel.currentPage,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.black,
-        onTap: (index) {
-          // 탭할 때마다 페이지를 전환하도록 설정
-          homeViewModel.setCurrentPage = index;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => navViewModel.getPageAtIndex(index),
-            ),
-          );
-        },
-      ),
+      bottomNavigationBar: const BottomBar(),
     );
   }
 }

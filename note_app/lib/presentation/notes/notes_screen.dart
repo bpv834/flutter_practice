@@ -1,5 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:note_app/data/repository/note_repository_impl.dart';
+import 'package:note_app/domain/use_case/add_note_use_case.dart';
+import 'package:note_app/domain/use_case/delete_note_use_case.dart';
+import 'package:note_app/domain/use_case/get_note_use_case.dart';
+import 'package:note_app/domain/use_case/get_notes_use_case.dart';
+import 'package:note_app/domain/use_case/update_note_use_case.dart';
+import 'package:note_app/domain/use_case/use_cases.dart';
 import 'package:note_app/presentation/add_edit_note/add_edit_note_screen.dart';
+import 'package:note_app/presentation/add_edit_note/add_edit_note_view_model.dart';
 import 'package:note_app/presentation/notes/components/note_item.dart';
 import 'package:note_app/presentation/notes/components/order_section.dart';
 import 'package:note_app/presentation/notes/notes_event.dart';
@@ -10,8 +21,8 @@ import 'package:provider/provider.dart';
 import '../../domain/model/note.dart';
 import '../../domain/util/note_order.dart';
 
-class NoteScreen extends StatelessWidget {
-  const NoteScreen({super.key});
+class NotesScreen extends StatelessWidget {
+  const NotesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +32,7 @@ class NoteScreen extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         title: Text(
-          'Your note',
+          viewModel.titleRepository.getTitle(),
           style: TextStyle(color: Colors.white),
         ),
         actions: [
@@ -50,14 +61,10 @@ class NoteScreen extends StatelessWidget {
                 .map(
                   (note) => GestureDetector(
                     onTap: () async {
-                      bool? isSaved = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddEditNoteScreen(
-                            note: note,
-                          ),
-                        ),
-                      );
+                      //note를 jsonEncode해서 queryParm에 넣고, uri객체를 푸시에 넘겨줌
+                      // queryParameters 는 map형태로 보내야 함
+                      final uri = Uri(path: '/edit_note',queryParameters: {'note': jsonEncode(note.toJson())});
+                      bool? isSaved = await context.push(uri.toString());
                       if (isSaved!) {
                         viewModel.onEvent(NotesEvent.loadNotes());
                       }
@@ -85,16 +92,10 @@ class NoteScreen extends StatelessWidget {
         onPressed: () async {
           //navpush= Future를 리턴함
           //navpush를 하면 어떤 불리언 값을 리턴받는가? 받는 이유는 무엇인가? 푸시를 한 후 다음 화면에서 pop을 하면서 값을 줄 수 있다.
-          bool? isSaved = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddEditNoteScreen(),
-            ),
-          );
+          bool? isSaved = await context.push('/add_note');
           //전환된 화면에서 pop을 하고 돌아온 순간 아래를 진행하는가? 맞다
           //push를 하자마자 트루를 리턴하는가? 아니다 다음 화면에서 navpop할때  context와 true를 리턴받아 리로드 한다 받을때
-          //버튼을 누르자 마자 loadnotes를 하면 새로 추가될 내용은 어찌 불러서 리로드 하는가?
-          //true 가 되는 이유는 다음 페이지에서 pop할때 true를 리턴해주기 떄문인가? 그렇다고 한다
+
           if (isSaved != null && isSaved) {
             viewModel.onEvent(NotesEvent.loadNotes());
           }

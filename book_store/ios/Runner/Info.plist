@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
+	    <key>NSPhotoLibraryUsageDescription</key>
+        <string></string>
+        <key>NSCameraUsageDescription</key>
+        <string></string>
+        <key>NSMicrophoneUsageDescription</key>
+        <string></string>
 	    <key>NSLocationWhenInUseUsageDescription</key>
         <string>앱이 사용 중일 때 위치 정보에 접근합니다.</string>
         <key>NSLocationAlwaysUsageDescription</key>

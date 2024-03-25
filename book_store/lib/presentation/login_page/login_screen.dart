@@ -1,17 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
+
 import 'package:book_store/core/customer_info_view_model.dart';
+import 'package:book_store/domain/model/user_info.dart';
 import 'package:book_store/presentation/home_page/home_screen.dart';
 import 'package:book_store/presentation/home_page/home_view_model.dart';
-import 'package:book_store/presentation/nav_page/nav_screen.dart';
+import 'package:book_store/presentation/input_inform_page/input_infrom_screen.dart';
+import 'package:book_store/presentation/login_page/login_view_model.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:provider/provider.dart';
 
 import 'login_platform.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:http/http.dart' as http;
-import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,47 +22,115 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    FlutterNativeSplash.remove();
-  }
 
-  LoginPlatform _loginPlatform = LoginPlatform.none;
 
-  void signInWithKakao() async {
+  final LoginPlatform _loginPlatform = LoginPlatform.none;
+
+  void signInWithKakao(BuildContext context) async {
     try {
+      OAuthToken? token;
       bool isInstalled = await isKakaoTalkInstalled();
+      bool hasToken=false;
 
-      OAuthToken token = isInstalled
-          ? await UserApi.instance.loginWithKakaoTalk()
-          : await UserApi.instance.loginWithKakaoAccount();
+      if (await AuthApi.instance.hasToken()) {
+        try {
+          print('토큰이 존재');
+          //유효성 체크를 해서 토큰이 있으면
+          hasToken=true;
+          AccessTokenInfo tokenInfo = await UserApi.instance.accessTokenInfo();
+          print('토큰 유효성 체크 성공 ${tokenInfo.id} ${tokenInfo.expiresIn}');
+          //로그인 진행
+          try {
+            token = isInstalled
+                ? await UserApi.instance.loginWithKakaoTalk()
+                : await UserApi.instance.loginWithKakaoAccount();
+            print('로그인 성공 ${token.accessToken}');
+          } catch (error) {
+            print('로그인 실패 $error');
+          }
+        } catch (error) {
+          //토큰에 문제가 있으면
+          if (error is KakaoException && error.isInvalidTokenError()) {
+            print('토큰 만료 $error');
+          } else {
+            print('토큰 정보 조회 실패 $error');
+          }
+          //토큰을 다시 받는 작업 시행
+          try {
+            //로그인 절차 진행
+            token = isInstalled
+                ? await UserApi.instance.loginWithKakaoTalk()
+                : await UserApi.instance.loginWithKakaoAccount();
+            print('로그인 성공 ${token.accessToken}');
+          } catch (error) {
+            print('로그인 실패 $error');
+          }
+        }
+      } else {
+        //유효성 체크를 해서 토큰이 없으면
+        //처음 로그인 하는 상황
+        print('발급된 토큰 없음');
+        try {
+          //로그인 절차 진행
+          token = isInstalled
+              ? await UserApi.instance.loginWithKakaoTalk()
+              : await UserApi.instance.loginWithKakaoAccount();
+          print('로그인 성공 ${token.accessToken}');
 
-      final url = Uri.https('kapi.kakao.com', '/v2/user/me');
+          final url = Uri.https('kapi.kakao.com', '/v2/user/me');
+          final response = await http.get(
+            url,
+            headers: {
+              HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
+            },
+          );
+          final profileInfo = json.decode(response.body);
+          final id = profileInfo['id'];
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InputInformScreen(
+                id: id,
+              ),
+            ),
+          );
+        } catch (error) {
+          print('로그인 실패 $error');
+        }
+      }
 
-      final response = await http.get(
-        url,
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
-        },
-      );
+      if(hasToken){
+        final url = Uri.https('kapi.kakao.com', '/v2/user/me');
+        final response = await http.get(
+          url,
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ${token!.accessToken}'
+          },
+        );
+        final customerInfoViewModel = context.read<CustomerInfoViewModel>();
+        final homeViewModel = context.read<HomeViewModel>();
+        final loginViewModel = context.read<LoginViewModel>();
 
-      final customerInfoViewModel = context.read<CustomerInfoViewModel>();
-      final homeViewModel = context.read<HomeViewModel>();
-      final profileInfo = json.decode(response.body);
-      final id = profileInfo['id'];
-      final picUrl = json.decode(response.body)['properties']['profile_image'];
+        final profileInfo = json.decode(response.body);
+        final id = profileInfo['id'];
 
-      customerInfoViewModel.setId(id);
-      customerInfoViewModel.setProfileImageUrl(picUrl);
-      customerInfoViewModel.setPlatform(LoginPlatform.kakao);
+        UserInfo userInfo = await loginViewModel.getUserInfo(id);
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
-      homeViewModel.setCurrentPage=0;
+        customerInfoViewModel.setId(userInfo.id);
+        customerInfoViewModel.setNickName(userInfo.nickname);
+        customerInfoViewModel.setAge(userInfo.age);
+        customerInfoViewModel.setCategory(userInfo.category);
+        customerInfoViewModel.setProfileImageUrl(userInfo.profileImage);
+        customerInfoViewModel.setPlatform(LoginPlatform.kakao);
+        print('토큰있음 userId: ${userInfo.id}, userNick: ${userInfo.nickname}, userAge: ${userInfo.age}, userImageLink: ${userInfo.profileImage}');
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+        homeViewModel.setCurrentPage = 0;
+      }
+
     } catch (error) {
       print('카카오톡으로 로그인 실패 $error');
     }
@@ -80,7 +149,6 @@ class _LoginScreenState extends State<LoginScreen> {
       case LoginPlatform.none:
         break;
     }
-
     customerInfoViewModel.setPlatform(LoginPlatform.none);
   }
 
@@ -123,8 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('구글  로그인'),
-            Text('네이버  로그인'),
+            Text('카카오 계정으로 로그인 하기'),
             Center(
               child: customViewModel.loginPlatform != LoginPlatform.none
                   ? _logoutButton()
@@ -133,11 +200,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         _loginButton(
                           'kakao',
-                          signInWithKakao,
+                          () => signInWithKakao(context),
                         )
                       ],
                     ),
             ),
+            TextButton(
+              onPressed: () {},
+              child: Text('카카오 계정으로 회원가입 하기'),
+            )
           ],
         ),
       ),

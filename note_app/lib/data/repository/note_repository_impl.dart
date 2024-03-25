@@ -1,7 +1,10 @@
+import 'package:injectable/injectable.dart';
 import 'package:note_app/data/data_source/note_db_helper.dart';
 import 'package:note_app/domain/model/note.dart';
 import 'package:note_app/domain/repository/note_repository.dart';
 
+//추상 클래스를 요청하면, impl객체를 부르는 의미
+@Singleton(as: NoteRepository)
 class NoteRepositoryImpl implements NoteRepository {
   NoteDbHelper db;
 

@@ -1,3 +1,4 @@
+import 'package:book_store/domain/model/simple_store.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -5,7 +6,9 @@ import 'package:flutter/foundation.dart';
 part 'map_ui_event.freezed.dart';
 @freezed
 sealed class MapUiEvent with _$MapUiEvent {
-  const factory MapUiEvent.clickMaka() = ClickMaka;
+  const factory MapUiEvent.clickMaka(SimpleStore simpleStore) = ClickMaka;
+  const factory MapUiEvent.clickContainer(int id) = ClickContainer;
+  const factory MapUiEvent.switchRadius(int radius) = SwitchRadius;
 
 
 }

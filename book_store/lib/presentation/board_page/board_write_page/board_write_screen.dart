@@ -1,20 +1,28 @@
+import 'dart:io';
+
+import 'package:book_store/presentation/board_page/board_write_page/board_write_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/customer_info_view_model.dart';
-import '../../home_page/home_view_model.dart';
-import '../../nav_page/nav_view_model.dart';
+import '../board_page/board_view_model.dart';
 
 class BoardWriteScreen extends StatefulWidget {
-  const BoardWriteScreen({super.key});
+  const BoardWriteScreen({
+    super.key,
+    this.boardId,
+  });
+
+  final int? boardId;
 
   @override
   State<BoardWriteScreen> createState() => _BoardWriteScreenState();
 }
 
 class _BoardWriteScreenState extends State<BoardWriteScreen> {
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _contentController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
 
   @override
   void dispose() {
@@ -27,8 +35,8 @@ class _BoardWriteScreenState extends State<BoardWriteScreen> {
   @override
   Widget build(BuildContext context) {
     final customerInfoViewModel = context.read<CustomerInfoViewModel>();
-    final homeViewModel = context.read<HomeViewModel>();
-    final navViewModel = context.read<NavViewModel>();
+    final viewModel = context.watch<BoardWriteViewModel>();
+    final boardViewModel = context.watch<BoardViewModel>();
 
     return Scaffold(
       appBar: AppBar(
@@ -41,7 +49,13 @@ class _BoardWriteScreenState extends State<BoardWriteScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () async {
+              await viewModel.saveBoard(
+                  context, _contentController.text, _titleController.text);
+              await boardViewModel
+                  .getBoardList(customerInfoViewModel.token);
+              Navigator.pop(context);
+            },
             child: Text(
               '완료',
               style: TextStyle(
@@ -53,9 +67,10 @@ class _BoardWriteScreenState extends State<BoardWriteScreen> {
         ],
         leading: IconButton(
           onPressed: () {
+            viewModel.setImage(XFile(''));
             Navigator.pop(context);
           },
-          icon: Icon(Icons.close),
+          icon: const Icon(Icons.close),
         ),
       ),
       body: SingleChildScrollView(
@@ -64,13 +79,12 @@ class _BoardWriteScreenState extends State<BoardWriteScreen> {
             //제목 컨테이너
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey,
                 borderRadius: BorderRadius.circular(8.0), // 테두리 둥글기 설정
               ),
               child: TextField(
                 maxLines: 1,
                 controller: _titleController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: '글 제목, 내용',
                   // 힌트 텍스트
                   contentPadding: EdgeInsets.all(12.0),
@@ -79,60 +93,58 @@ class _BoardWriteScreenState extends State<BoardWriteScreen> {
               ),
             ),
             //내용 컨테이너
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey,
-              ),
-              child: TextField(
-                maxLines: null, // null로 설정하면 여러 줄 입력 가능
-                controller: _contentController,
-                decoration: InputDecoration(
-                  hintText: '내용을 입력하세요',
-                  // 힌트 텍스트
-                  contentPadding: EdgeInsets.all(12.0),
-                  // 텍스트 입력 필드 내부의 여백 설정
-                  border: InputBorder.none,
+            SingleChildScrollView(
+              child: Container(
+                height: customerInfoViewModel.screenHeight / 1.88,
+                decoration: const BoxDecoration(),
+                child: TextField(
+                  maxLines: null, // null로 설정하면 여러 줄 입력 가능
+                  controller: _contentController,
+                  decoration: const InputDecoration(
+                    hintText: '내용을 입력하세요',
+                    // 힌트 텍스트
+                    contentPadding: EdgeInsets.all(12.0),
+                    // 텍스트 입력 필드 내부의 여백 설정
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
             ),
             //사진 컨테이너
-            Container(
-              child: Row(
-                children: [
-                  Stack(
+             viewModel.image.path.isNotEmpty
+                ? Row(
                     children: [
-                      Container(
-                        width: customerInfoViewModel.screenWidth / 1.5,
-                        // 정사각형의 가로 길이
-                        height: customerInfoViewModel.screenHeight / 4,
-                        // 정사각형의 세로 길이
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey, // 테두리 색상 설정
-                            width: 1.0, // 테두리 두께 설정
+                      Stack(
+                        children: [
+                          Container(
+                            width: customerInfoViewModel.screenWidth / 4,
+                            // 정사각형의 가로 길이
+                            height: customerInfoViewModel.screenHeight / 6,
+                            // 정사각형의 세로 길이
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image:
+                                    FileImage(File(viewModel.image.path)),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(16.0),
-                          image: DecorationImage(
-                              fit: BoxFit.fill,
-                              image: NetworkImage(
-                                  'https://e1.pngegg.com/pngimages/487/453/png-clipart-iu-thumbnail.png')
-                            // 이미지 파일의 경로
+                          Positioned(
+                            bottom: -15, // 아이콘을 아래로 이동
+                            right: -15, // 아이콘을 오른쪽으로 이동
+                            child: IconButton(
+                              onPressed: () {
+                                XFile? nullImage;
+                                viewModel.setImage(nullImage);
+                              },
+                              icon: const Icon(Icons.close),
+                            ),
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: -15, // 아이콘을 아래로 이동
-                        right: -15, // 아이콘을 오른쪽으로 이동
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.close),
-                        ),
+                        ],
                       ),
                     ],
-                  ),
-                ],
-              ),
-            ),
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -142,8 +154,10 @@ class _BoardWriteScreenState extends State<BoardWriteScreen> {
         child: Row(
           children: [
             IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.camera),
+              onPressed: () {
+                viewModel.getImage(ImageSource.gallery);
+              },
+              icon: const Icon(Icons.camera),
             ),
           ],
         ),

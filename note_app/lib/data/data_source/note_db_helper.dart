@@ -1,7 +1,8 @@
+import 'package:injectable/injectable.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../domain/model/note.dart';
-
+@singleton
 class NoteDbHelper {
   Database db;
 //테이블을 받아와 헬퍼에 넣음

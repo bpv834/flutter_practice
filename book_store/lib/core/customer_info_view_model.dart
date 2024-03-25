@@ -1,19 +1,18 @@
 import 'package:book_store/presentation/login_page/login_platform.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+
 
 class CustomerInfoViewModel with ChangeNotifier {
   int? _token;
   double? _screenHeight;
   double? _screenWidth;
-  String? nickname;
-  String? category;
-  String? age;
+  String? _nickname;
+  String? _category;
+  int? _age;
   String? _profileImageUrl;
   LoginPlatform? _loginPlatform;
-  double _lat = 32.1234;
-  double _long = 88.8888;
-  Position? _position;
+  double _lat = 0;
+  double _long = 0;
 
 
   void setId(int? id) {
@@ -23,6 +22,21 @@ class CustomerInfoViewModel with ChangeNotifier {
 
   void setProfileImageUrl(String? profileImageUrl) {
     _profileImageUrl = profileImageUrl;
+    notifyListeners();
+  }
+
+  void setNickName(String? nickName) {
+    _nickname=nickName;
+    notifyListeners();
+  }
+
+  void setCategory(String? category) {
+    _category=category;
+    notifyListeners();
+  }
+
+  void setAge(int? age) {
+    _age=age;
     notifyListeners();
   }
 
@@ -42,6 +56,7 @@ class CustomerInfoViewModel with ChangeNotifier {
   }
   // 위치 정보를 설정하고 알림을 보내는 메서드
   void setCurrentLocation(double latitude, double longitude) {
+    debugPrint('위치 수정');
     _lat = latitude;
     _long = longitude;
     notifyListeners();
@@ -57,10 +72,13 @@ class CustomerInfoViewModel with ChangeNotifier {
 
   String get profileImageUrl => _profileImageUrl ?? '';
 
-  double get lat => _lat ?? 0;
+  double get lat => _lat ;
 
-  double get long => _long ?? 0;
+  double get long => _long;
 
+  String get nickname => _nickname??'null';
 
+  int get age => _age??25;
 
+  String get category => _category??'null';
 }

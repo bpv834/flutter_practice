@@ -8,8 +8,8 @@ class NavViewModel with ChangeNotifier{
    List<Widget> _pages = [
     HomeScreen(),
     BoardScreen(),
-    MapScreen(),
-    MyScreen(),
+    const MapScreen(),
+    const MyScreen(),
   ];
 
   List<Widget> get pages => _pages;

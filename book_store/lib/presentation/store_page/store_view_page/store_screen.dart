@@ -1,164 +1,134 @@
 import 'package:book_store/core/customer_info_view_model.dart';
+import 'package:book_store/domain/model/simple_store.dart';
+import 'package:book_store/presentation/start_page/splash_view_model.dart';
+import 'package:book_store/presentation/store_page/store_view_page/store_event.dart';
 import 'package:book_store/presentation/store_page/store_view_page/store_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../store_detail_page/store_detail_screen.dart';
+import '../components/store_simple_info.dart';
 
-class StoreViewScreen extends StatefulWidget {
-  StoreViewScreen({super.key, this.barName, this.regionName});
+class StoreViewScreen extends StatelessWidget {
+  StoreViewScreen({
+    super.key,
+    this.barName,
+    this.regionName,
+    required this.simpleStores,
+  });
 
-  final barName;
-  final regionName;
+  final List<SimpleStore> simpleStores;
 
-  @override
-  State<StoreViewScreen> createState() => _StoreViewScreenState();
-}
+  final String? barName;
+  final String? regionName;
 
-class _StoreViewScreenState extends State<StoreViewScreen> {
-  TextEditingController _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    _controller.dispose();
-    super.dispose();
-  }
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final customerInfoViewModel = context.read<CustomerInfoViewModel>();
-    final storeViewModel =context.read<StoreViewModel>();
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          storeViewModel.barName,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+    final customerInfoViewModel = context.watch<CustomerInfoViewModel>();
+    final storeViewModel = context.watch<StoreViewModel>();
+    final splashViewModel = context.watch<SplashViewModel>();
+
+
+    return WillPopScope(
+      onWillPop: () async {
+        storeViewModel.setIsNearBy(false);
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            storeViewModel.barTagName,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          leading: IconButton(
+            onPressed: () {
+              storeViewModel.setIsNearBy(false);
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.close),
           ),
         ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.close),
-        ),
-      ),
-      body: Column(
-        children: [
-          Container(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey), // 테두리 색상 설정
-                      borderRadius: BorderRadius.circular(8.0), // 테두리 둥글기 설정
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      decoration: InputDecoration(
-                        hintText: '텍스트를 입력하세요.',
-                        // 힌트 텍스트
-                        contentPadding: EdgeInsets.all(12.0),
-                        // 텍스트 입력 필드 내부의 여백 설정
-                        border: InputBorder.none, // 기본 테두리 제거
-                      ),
+        body: Column(children: [
+          //입력창 + 검색창
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey), // 테두리 색상 설정
+                    borderRadius: BorderRadius.circular(8.0), // 테두리 둥글기 설정
+                  ),
+                  child: TextField(
+                    onChanged: (query) {
+                      storeViewModel.onEvent(
+                          StoreEvent.searchStore(
+                              query, splashViewModel, customerInfoViewModel),
+                          context);
+                    },
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      hintText: '찾는 서점 이름을 입력하세요.',
+                      // 힌트 텍스트
+                      contentPadding: EdgeInsets.all(12.0),
+                      // 텍스트 입력 필드 내부의 여백 설정
+                      border: InputBorder.none, // 기본 테두리 제거
                     ),
                   ),
                 ),
-                TextButton(onPressed: () {}, child: Text('검색'))
-              ],
-            ),
+              ),
+            ],
           ),
-          Container(
-              child: Row(
+          //지역 이름 or 내주변
+          Row(
             children: [
               Text(
-                storeViewModel.regionName??'내 주변',
+                storeViewModel.regionTagName ?? '내 주변',
                 style: TextStyle(
                     fontSize: customerInfoViewModel.screenHeight / 20,
                     fontWeight: FontWeight.bold),
               ),
+              Text(
+                '${storeViewModel.stores.length}가 검색 됨',
+                style: TextStyle(
+                    fontSize: customerInfoViewModel.screenWidth / 20,
+                    fontWeight: FontWeight.bold),
+              ),
             ],
-          )),
+          ),
+          //서점 리스트 표시
           Expanded(
             child: Container(
-              child: ListView(
-                children: [
-                  SingleChildScrollView(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => StoreDetailScreen()),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Colors.black,
-                            )),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: customerInfoViewModel.screenWidth / 2,
-                              // 정사각형의 가로 길이
-                              height: customerInfoViewModel.screenHeight / 6,
-                              // 정사각형의 세로 길이
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey, // 테두리 색상 설정
-                                  width: 1.0, // 테두리 두께 설정
-                                ),
-                                borderRadius: BorderRadius.circular(16.0),
-                                image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: NetworkImage(
-                                        'https://e1.pngegg.com/pngimages/487/453/png-clipart-iu-thumbnail.png')
-                                    // 이미지 파일의 경로
-                                    ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '서점 이름',
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      fontSize:
-                                          customerInfoViewModel.screenHeight /
-                                              25,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    '서점 주소',
-                                    style: TextStyle(
-                                      fontSize:
-                                          customerInfoViewModel.screenHeight /
-                                              35,
-                                    ),
-                                    maxLines: 1,
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+              child: !storeViewModel.isLoading
+                  ? ListView.builder(
+                itemCount: storeViewModel.stores.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    child: StoreSimpleInfo(
+                      id: storeViewModel.stores[index].id!,
+                      profileUrl: storeViewModel.stores[index].imageUrl,
+                      storeName: storeViewModel.stores[index].name,
+                      storeAddr: storeViewModel.stores[index].address,
+                      category: storeViewModel.stores[index].category,
                     ),
-                  )
-                ],
-              ),
+                    onTap: () {
+                      storeViewModel.onEvent(
+                        StoreEvent.touchTile(
+                          storeViewModel.stores[index].id!,
+                        ),
+                        context,
+                      );
+                    },
+                  );
+                },
+              )
+                  : const CircularProgressIndicator(),
             ),
           ),
-        ],
+        ]),
       ),
     );
   }

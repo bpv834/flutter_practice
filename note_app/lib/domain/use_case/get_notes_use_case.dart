@@ -1,8 +1,9 @@
+import 'package:injectable/injectable.dart';
 import 'package:note_app/domain/repository/note_repository.dart';
 import 'package:note_app/domain/util/note_order.dart';
 
 import '../model/note.dart';
-
+@singleton
 class GetNotesUseCase {
   //repository 는 crud 기능이 구현돼 있는 상태로 생성자를 받음
   final NoteRepository repository;

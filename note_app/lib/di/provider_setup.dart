@@ -1,3 +1,4 @@
+/*
 import 'package:note_app/data/data_source/note_db_helper.dart';
 import 'package:note_app/data/repository/note_repository_impl.dart';
 import 'package:note_app/domain/repository/note_repository.dart';
@@ -14,6 +15,7 @@ import 'package:provider/single_child_widget.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<List<SingleChildWidget>> getProviders() async {
+  //내가 만든 클래스가아니라면, 의존성 주입시에 module을 사용해야 함 (써드파티 객체를 사용)
   Database database = await openDatabase(
     'notes_db',
     version: 1,
@@ -23,7 +25,7 @@ Future<List<SingleChildWidget>> getProviders() async {
     },
   );
   NoteDbHelper noteDbHelper = NoteDbHelper(database);
-  NoteRepository repository = NoteRepositoryImpl(noteDbHelper);
+  NoteRepositoryImpl repository = NoteRepositoryImpl(noteDbHelper);
   UseCases useCases = UseCases(
     addNoteUseCase: AddNoteUseCase(repository),
     deleteNoteUseCase: DeleteNoteUseCase(repository),
@@ -32,10 +34,10 @@ Future<List<SingleChildWidget>> getProviders() async {
     updateNoteUseCase: UpdateNoteUseCase(repository),
   );
   NotesViewModel notesViewModel = NotesViewModel(useCases);
-  AddEditNoteViewModel addEditNoteViewModel = AddEditNoteViewModel(useCases);
 
   return [
     ChangeNotifierProvider(create: (_) => notesViewModel),
-    ChangeNotifierProvider(create: (_) => addEditNoteViewModel),
+    Provider(create: (_)=> repository)
   ];
 }
+*/

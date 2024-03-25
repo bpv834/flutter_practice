@@ -12,7 +12,7 @@ class AddEditNoteScreen extends StatefulWidget {
   final Note? note;
 
   //새로 메모를 만들어 안들어올수도(노트 수정하는 경우) 있으니 required X
-  AddEditNoteScreen({super.key, this.note});
+  const AddEditNoteScreen({super.key, this.note});
 
   @override
   State<AddEditNoteScreen> createState() => _AddEditNoteScreenState();
@@ -21,6 +21,7 @@ class AddEditNoteScreen extends StatefulWidget {
 class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+
   //StreamSubscription은 Dart에서 스트림을 구독하고 해당 스트림에서 발생하는 이벤트를 수신하는 데 사용되는 객체입니다. 스트림은 비동기적으로 데이터를 생성하는데 사용되며, 스트림을 사용하면 데이터가 생성되는 즉시 해당 데이터를 수신하거나 처리할 수 있습니다.
   StreamSubscription? _streamSubscription;
   final List<Color> noteColors = [
@@ -33,30 +34,27 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
 
   @override
   void initState() {
-    if (widget.note != null) {
-      _titleController.text = widget.note!.title;
-      _contentController.text = widget.note!.content;
-    }
     super.initState();
     //init 내에서 view모델을 바로 사용 불가 따라서microtast 사용
     Future.microtask(() {
       //반드시 context.read로 호출해야 함
       final viewModel = context.read<AddEditNoteViewModel>();
+      if (widget.note != null) {
+        _titleController.text = widget.note!.title;
+        _contentController.text = widget.note!.content;
+        viewModel.onEvent(AddEditNoteEvent.changeColor(widget.note!.color));
+      }
 
       //화면이 사라져도 리슨을 계속 하고있는 상태이기 때문에 subscription으로 관리해야함
       //화면을 닫을때 scription을 cancle해줘야 함
       _streamSubscription = viewModel.eventStream.listen((event) {
-        event.when(
-            saveNote: () {
-              //뒤로가기로 pop이 된건지, 메모를 작성하고 난 후 화면을 리로드한건지 구분 하기 위해 true 넘겨줌
-              //true 어디에 넘겨주는것인가?
-              //팝된 화면에 true를 넘겨주는것인가?
-              Navigator.pop(context, true);
-            },
-            showSnackBar: (String message) {
-              final snackBar = SnackBar(content: Text(message));
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            });
+        event.when(saveNote: () {
+          //뒤로가기로 pop이 된건지, 메모를 작성하고 난 후 화면을 리로드한건지 구분 하기 위해 true 넘겨줌
+          Navigator.pop(context, true);
+        }, showSnackBar: (String message) {
+          final snackBar = SnackBar(content: Text(message));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        });
       });
     });
   }

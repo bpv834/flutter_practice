@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 import 'package:note_app/domain/model/note.dart';
 import 'package:note_app/domain/repository/note_repository.dart';
 import 'package:note_app/domain/use_case/use_cases.dart';
@@ -8,6 +9,7 @@ import 'package:note_app/presentation/add_edit_note/add_edit_note_event.dart';
 import 'package:note_app/presentation/add_edit_note/add_edit_note_ui_event.dart';
 import 'package:note_app/ui/colors.dart';
 
+@injectable
 class AddEditNoteViewModel with ChangeNotifier {
   final UseCases useCases;
 

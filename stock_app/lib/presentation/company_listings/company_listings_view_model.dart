@@ -38,10 +38,7 @@ class CompanyListingsViewModel with ChangeNotifier {
     );
   }
 
-  Future _getCompanyListings({
-    bool fetchFromRemote = false,
-    String query = '',
-  }) async {
+  Future _getCompanyListings({bool fetchFromRemote = false, String query = ''}) async {
     _state = state.copyWith(
       isLoading: true,
     );

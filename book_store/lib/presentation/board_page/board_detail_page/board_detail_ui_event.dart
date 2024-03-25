@@ -1,3 +1,5 @@
+import 'package:book_store/domain/model/heart_info.dart';
+import 'package:book_store/domain/model/reply_info.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -5,5 +7,7 @@ import 'package:flutter/foundation.dart';
 part 'board_detail_ui_event.freezed.dart';
 @freezed
 sealed class BoardDetailUiEvent with _$BoardDetailUiEvent {
-  const factory BoardDetailUiEvent.likeTap(bool isLiked) = LikeTap;
+  const factory BoardDetailUiEvent.likeTap({required HeartInfo heartInfo}) = LikeTap;
+  const factory BoardDetailUiEvent.writeReply({required ReplyInfo replyInfo, required int boardId,required int userId,required String content}) = WriteReply;
+
 }

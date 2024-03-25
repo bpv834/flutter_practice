@@ -1,44 +1,44 @@
 import 'package:book_store/core/customer_info_view_model.dart';
+import 'package:book_store/presentation/home_page/area_section/region_section.dart';
+import 'package:book_store/presentation/home_page/components/best_board_gesture_detector.dart';
+import 'package:book_store/presentation/home_page/components/build_region_button.dart';
+import 'package:book_store/presentation/home_page/home_event.dart';
 import 'package:book_store/presentation/home_page/home_view_model.dart';
+import 'package:book_store/presentation/start_page/splash_view_model.dart';
 import 'package:book_store/presentation/store_page/store_view_page/store_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../nav_page/nav_view_model.dart';
+import '../nav_page/bottom_bar.dart';
 import '../store_page/store_view_page/store_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
   Widget build(BuildContext context) {
-    final homeViewModel = context.read<HomeViewModel>();
-    final customViewModel = context.read<CustomerInfoViewModel>();
-    final navViewModel = context.read<NavViewModel>();
-    final storeViewModel = context.read<StoreViewModel>();
+    final viewModel = context.watch<HomeViewModel>();
+    final customViewModel = context.watch<CustomerInfoViewModel>();
+    final storeViewModel = context.watch<StoreViewModel>();
+    final splashViewModel = context.watch<SplashViewModel>();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: Text(
+        title: const Text(
           'Home',
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
-
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Center(
             child: Column(children: [
-              Row(
+              const Row(
                 children: [
                   Text(
                     '실시간 인기글',
@@ -46,93 +46,47 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              Column(
-                children: [
-                  Text('인기글1'),
-                  Text('인기글2'),
-                  SizedBox(height: customViewModel.screenHeight / 10),
-                ],
+              SizedBox(
+                height: customViewModel.screenHeight / 2.4,
+                child: ListView.builder(
+                    itemCount: viewModel.bestBoardList.length,
+                    itemBuilder: (context, index) {
+                      int boardId = viewModel.bestBoardList[index].id;
+                      return BestBoardGestureDetector(index: index, boardId: boardId,);
+                    }),
               ),
+              //내 주변서점, 화살표 버튼
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '내 주변 서점',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    '내 주변 서점 : ${storeViewModel.nearByStores.length}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
                   IconButton(
-                    onPressed: () {
-                      storeViewModel.barName='내 주변 서점';
-                      storeViewModel.regionName='';
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => StoreViewScreen()),
+                    onPressed: () async {
+                      storeViewModel.isLoading = true;
+                      storeViewModel.isNearBy = true;
+                      await splashViewModel.getNearByStores(customViewModel);
+                      storeViewModel.stores = splashViewModel.nearByList;
+                      viewModel.onEvent(
+                        HomeEvent.nearbyStore(storeViewModel.stores, context),
                       );
+                      storeViewModel.barTagName = '내 주변 서점';
+                      storeViewModel.regionTagName = '';
+                      storeViewModel.isLoading = false;
                     },
-                    icon: Icon(Icons.arrow_forward),
+                    icon: const Icon(Icons.arrow_forward),
                   ),
                 ],
               ),
-              Column(children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    CircleAvatar(
-                     /* backgroundImage:
-                          NetworkImage(customViewModel.profileImageUrl),*/
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      '주변서점이름',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text('나와의 거리')
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    CircleAvatar(
-                     /* backgroundImage:
-                          NetworkImage(customViewModel.profileImageUrl),*/
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      '주변서점이름',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text('나와의 거리')
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    CircleAvatar(
-                    /*  backgroundImage:
-                          NetworkImage(customViewModel.profileImageUrl),*/
-                    ),
-                    SizedBox(width: 5),
-                    Text(
-                      '주변서점이름',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text('나와의 거리')
-                  ],
-                ),
-              ]),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(
                     height: customViewModel.screenHeight / 10,
                   ),
+                  //지역별 서점 텍스트 자리
                   const Row(
                     children: [
                       Text(
@@ -142,22 +96,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  Container(
+                  const SizedBox(height: 10),
+                  //지역별 서점 구분 컨테이너
+                  SizedBox(
                     height: customViewModel.screenHeight / 3,
                     child: Column(
                       children: [
+                        //전체서점, 서울/경기/인천
                         Expanded(
                           child: Row(
                             children: [
+                              //전체서점
                               Expanded(
                                 child: InkWell(
-                                  onTap: () {
-                                    storeViewModel.barName='지역별 서점';
-                                    storeViewModel.regionName='모든 지역';
-                                    Navigator.push(
+                                  onTap: () async {
+                                    storeViewModel.loadSimpleStores('');
+                                    storeViewModel.barTagName = '지역별 서점';
+                                    storeViewModel.regionTagName = '모든 지역';
+                                    storeViewModel.regionName = '';
+                                    //클릭하면서, 레포지토리 stores를 받아옴
+                                    viewModel.onEvent(const HomeEvent.byRegion(
+                                        RegionSection.all()));
+                                    await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => StoreViewScreen(),
+                                        builder: (context) => StoreViewScreen(
+                                            simpleStores:
+                                                storeViewModel.stores),
                                       ),
                                     );
                                   },
@@ -165,168 +130,74 @@ class _HomeScreenState extends State<HomeScreen> {
                                     decoration: BoxDecoration(
                                       border: Border.all(color: Colors.black),
                                     ),
-                                    child: Center(child: Text('전체보기')),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    storeViewModel.regionName='서울/경기/인천';
-                                    storeViewModel.barName='지역별 서점';
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StoreViewScreen(),
+                                    child: const Center(
+                                      child: Text(
+                                        '전체보기',
                                       ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
                                     ),
-                                    child: Center(child: Text('서울/경기/인천')),
                                   ),
                                 ),
                               ),
+                              //서울,경기,인천 서점
+                              const BuildRegionButton(
+                                  label: '서울@경기@인천',
+                                  regionName: '서울/경기/인천',
+                                  regionTagName: '서울/경기/인천',
+                                  barTagName: '지역별 서점'),
                             ],
                           ),
                         ),
-                        Expanded(
+                        //강원, 충청/대전
+                        const Expanded(
+                          //강원, 충청/대전 서점
                           child: Row(
                             children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    storeViewModel.regionName='강원';
-                                    storeViewModel.barName='지역별 서점';
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StoreViewScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                    ),
-                                    child: Center(child: Text('강원')),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    storeViewModel.regionName='충청/대전';
-                                    storeViewModel.barName='지역별 서점';
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StoreViewScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                    ),
-                                    child: Center(child: Text('충청/대전')),
-                                  ),
-                                ),
-                              ),
+                              //강원
+                              BuildRegionButton(
+                                  label: '강원',
+                                  regionName: '강원',
+                                  regionTagName: '강원',
+                                  barTagName: '지역별 서점'),
+                              //충청/대전
+                              BuildRegionButton(
+                                  label: '충청@대전',
+                                  regionName: '충청/대전',
+                                  regionTagName: '충청/대전',
+                                  barTagName: '지역별 서점'),
                             ],
                           ),
                         ),
-                        Expanded(
+                        //경북/대구, 전라/광주
+                        const Expanded(
                           child: Row(
                             children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    storeViewModel.regionName='경북/대구';
-                                    storeViewModel.barName='지역별 서점';
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StoreViewScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                    ),
-                                    child: Center(child: Text('경북/대구')),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    storeViewModel.regionName='전라/광주';
-                                    storeViewModel.barName='지역별 서점';
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StoreViewScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                    ),
-                                    child: Center(child: Text('전라/광주')),
-                                  ),
-                                ),
-                              ),
+                              BuildRegionButton(
+                                  label: '경상북도@대구',
+                                  regionName: '경북/대구',
+                                  regionTagName: '경북/대구',
+                                  barTagName: '지역별 서점'),
+                              BuildRegionButton(
+                                  label: '전라@광주',
+                                  regionName: '전라/광주',
+                                  regionTagName: '전라/광주',
+                                  barTagName: '지역별 서점'),
                             ],
                           ),
                         ),
-                        Expanded(
+                        // 부/울/경, 제주
+                        const Expanded(
                           child: Row(
                             children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    storeViewModel.regionName='부산/울산/경남';
-                                    storeViewModel.barName='지역별 서점';
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StoreViewScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                    ),
-                                    child: Center(child: Text('부산/울산/경남')),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    storeViewModel.regionName='제주';
-                                    storeViewModel.barName='지역별 서점';
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StoreViewScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black),
-                                    ),
-                                    child: Center(child: Text('제주')),
-                                  ),
-                                ),
-                              ),
+                              BuildRegionButton(
+                                  label: '부산@울산@경상남도',
+                                  regionName: '부산/울산/경남',
+                                  regionTagName: '부산/울산/경남',
+                                  barTagName: '지역별 서점'),
+                              BuildRegionButton(
+                                  label: '제주',
+                                  regionName: '제주',
+                                  regionTagName: '제주',
+                                  barTagName: '지역별 서점'),
                             ],
                           ),
                         ),
@@ -339,39 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.whatshot),
-            label: '홈',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.forum),
-            label: '게시판',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_on),
-            label: '지도',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '나의 정보',
-          ),
-        ],
-        currentIndex: homeViewModel.currentPage,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.black,
-        onTap: (index) {
-          // 탭할 때마다 페이지를 전환하도록 설정
-          homeViewModel.setCurrentPage = index;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => navViewModel.getPageAtIndex(index),
-            ),
-          );
-        },
-      ),
+      bottomNavigationBar: const BottomBar(),
     );
   }
 }
