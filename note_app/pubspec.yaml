@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider:
-  json_annotation: ^4.8.1
+  json_annotation:
   freezed_annotation:
   sqflite:
   go_router:
