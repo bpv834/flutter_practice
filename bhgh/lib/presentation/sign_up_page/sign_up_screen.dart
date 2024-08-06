@@ -132,7 +132,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       // 폼이 유효할 때 처리 로직을 여기에 추가하세요.
                       await viewModel.signup(_emailController, _passwordController, _nameController, _rrnController, _mainHabitController);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('가입 완료')),
+                        SnackBar(content: Text('메일을 확인해 주세요')),
                       );
                       context.push('/loginPage');
                     }
